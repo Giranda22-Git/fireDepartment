@@ -5,16 +5,20 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <div class="page-reload" @click="reload">Обновить карту</div>
-    <ActionButton :IsTurned="true" />
+    <ActionButton :IsTurned="true" @Search="Search"/>
+    <PulseAnimation v-if="Searching == true" />
   </q-page>
 </template>
 
 <script>
 import ActionButton from '../components/ActionButton.vue'
+import PulseAnimation from '../components/PulseAnimation.vue'
 export default {
   name: 'TwoGis',
-  updated () {
-    location.reload()
+  data(){
+    return{
+      Searching: false
+    }
   },
   watch:{
     Theme: function(oldV, NewV){
@@ -94,10 +98,14 @@ export default {
     },
     checkTheme(){
       document.getElementById('map').style.filter = `invert(${this.Theme == 'black' ? '100%' : '0%'})`
+    },
+    Search(){
+      this.Searching = true
     }
   },
   components:{
-    ActionButton
+    ActionButton,
+    PulseAnimation
   },
   computed: {
     Status () {

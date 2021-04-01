@@ -98,7 +98,8 @@ export default {
     },
     fireCall(){
       setTimeout(() => {
-        this.next = false     
+        this.next = false  
+        this.$emit('Search')   
       }, 550);
       document.getElementById('main').style.height = '0' 
       document.getElementById('icon').style.opacity = '0'

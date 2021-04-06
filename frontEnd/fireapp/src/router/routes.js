@@ -15,11 +15,16 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'login',
     component: () => import('pages/Login.vue')
   },
   {
-    name: 'error',
+    path: '/fireCalls',
+    component: () => import('layouts/fireCallsLayout.vue'),
+    children: [
+      { path: '', name: 'FireCalls', component: () => import('pages/FireCalls.vue') }
+    ]
+  },
+  {
     path: '/error',
     component: () => import('pages/Error404.vue')
   }

@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-// import example from './module-example'
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -10,9 +8,15 @@ export default new Vuex.Store({
       token: localStorage.getItem('token') || '',
       phone: localStorage.getItem('phone') || '',
       updated: false,
-      theme: localStorage.getItem('theme') || ''
+      theme: localStorage.getItem('theme') || 'white',
+      status: localStorage.getItem('status') || 'person',
+      actualCall: localStorage.getItem('actualCall') || {"adress": "SomeAdress"}
     },
     mutations: {
+      actualCall_ch(state, call){
+        state.actualCall = call
+        localStorage.setItem('actualCall', call)
+      },
       st_ch(state, status) {
         state.updated = status
       },
@@ -27,12 +31,15 @@ export default new Vuex.Store({
       logout(state){
         state.phone = ''
         state.token = ''
-        localStorage.removeItem('phone')
-        localStorage.removeItem('token')
+        localStorage.clear()
       },
       swichTheme(state){
         state.theme = state.theme == 'black' ? 'white' : 'black'
         localStorage.setItem('theme', state.theme == 'black' ? 'black' : 'white')
+      },
+      status_ch(state, status){
+        state.person = status
+        localStorage.setItem('status', status)
       }
     },
     actions: {
@@ -42,7 +49,8 @@ export default new Vuex.Store({
       },
     },
     getters: {
-      isLoggedIn: state => !!state.token
+      isLoggedIn: state => !!state.token,
+      status: state => state.status
     },
     strict: process.env.DEBUGGING
 

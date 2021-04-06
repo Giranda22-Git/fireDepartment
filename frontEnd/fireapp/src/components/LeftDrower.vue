@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-btn
-      style="position: absolute; z-index: 3000"
+      style="position: absolute; z-index: 30"
       flat
       dense
       round
@@ -42,20 +42,6 @@
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
 import { mapGetters } from 'vuex'
-const linksData = [
-  {
-    title: '2GIS',
-    caption: '2gis maps',
-    icon: 'public',
-    link: '/#/'
-  },
-  {
-    title: 'Settings',
-    caption: 'Settings',
-    icon: 'settings',
-    link: '/#/settings'
-  }
-]
 
 export default {
   name: 'LeftDrower',
@@ -63,7 +49,56 @@ export default {
   data () {
     return {
       leftDrawerOpen: false,
-      essentialLinks: linksData
+      essentialLinks: [
+      {
+        title: '2GIS',
+        caption: '2gis maps',
+        icon: 'public',
+        link: '/#/'
+      },
+      {
+        title: 'Settings',
+        caption: 'Settings',
+        icon: 'settings',
+        link: '/#/settings'
+      }]
+    }
+  },
+  beforeMount(){
+    if(this.status == 'person'){
+      this.essentialLinks = [
+      {
+        title: '2GIS',
+        caption: '2gis maps',
+        icon: 'public',
+        link: '/#/'
+      },
+      {
+        title: 'Settings',
+        caption: 'Settings',
+        icon: 'settings',
+        link: '/#/settings'
+      }]
+    }else if(this.status == 'saver'){
+      this.essentialLinks = [
+      {
+        title: '2GIS',
+        caption: '2gis maps',
+        icon: 'public',
+        link: '/#/'
+      },
+      {
+        title: 'Calls',
+        caption: 'fire calls',
+        icon: 'sensors',
+        link: '/#/fireCalls'
+      },
+      {
+        title: 'Settings',
+        caption: 'Settings',
+        icon: 'settings',
+        link: '/#/settings'
+      }]
     }
   },
   mounted(){
@@ -85,7 +120,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isLoggedIn']),
+    ...mapGetters(['isLoggedIn','status']),
     userName () {
       return this.$store.state.name
     },

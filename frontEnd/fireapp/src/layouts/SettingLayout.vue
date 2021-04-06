@@ -6,7 +6,6 @@
 import LeftDrower from 'components/LeftDrower.vue'
 
 export default {
-  name: 'SettingLayout',
   components: { LeftDrower },
   mounted () {
   }

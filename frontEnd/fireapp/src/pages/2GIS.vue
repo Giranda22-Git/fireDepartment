@@ -5,7 +5,7 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <div class="page-reload" @click="reload">Обновить карту</div>
-    <ActionButton :IsTurned="true" @Search="Search"/>
+    <ActionButton :IsTurned="true" :Adress="currentAdress" @Search="Search"/>
     <PulseAnimation v-if="Searching == true" />
   </q-page>
 </template>
@@ -13,11 +13,13 @@
 <script>
 import ActionButton from '../components/ActionButton.vue'
 import PulseAnimation from '../components/PulseAnimation.vue'
+import axios from 'axios'
 export default {
   name: 'TwoGis',
   data(){
     return{
-      Searching: false
+      Searching: false,
+      currentAdress: 'Ваш Адрес не определен'
     }
   },
   watch:{
@@ -26,10 +28,33 @@ export default {
     }
   },
   mounted () {
+const options = {
+  method: 'GET',
+  url: 'https://forward-reverse-geocoding.p.rapidapi.com/v1/forward',
+  params: {
+    format: 'json',
+    street: 'Бухар Жирау 27/5',
+    city: 'Алматы',
+    'accept-language': 'кг',
+    polygon_threshold: '0.0'
+  },
+  headers: {
+    'x-rapidapi-key': '0b0c351161msh5424ed2f45f6310p18a96bjsn3bdcf8c12636',
+    'x-rapidapi-host': 'forward-reverse-geocoding.p.rapidapi.com'
+  }
+};
+
+axios.request(options).then(function (response) {
+	console.log(response.data);
+}).catch(function (error) {
+	console.error(error);
+});
+
     this.activateButton()
     this.forceUpdate()
     this.checkTheme()
     var map, marker
+    var self = this
     var locationInfo = document.getElementById('location')
     var DG = require('2gis-maps')
     map = DG.map('map', {
@@ -40,6 +65,7 @@ export default {
       fullscreenControl: false
     })
     DG.control.traffic().addTo(map);
+    console.log(map);
     map.locate({ setView: true, watch: true })
       .on('locationfound', function (e) {
         let myDivIcon = DG.divIcon({
@@ -54,7 +80,7 @@ export default {
 
           map.on('move', function (e) {
             marker.setLatLng([map.getCenter().lat, map.getCenter().lng])
-            locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
+            // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
           })
           map.on('movestart', function(){
             document.querySelector('svg').style.marginTop = '-20px'
@@ -65,6 +91,17 @@ export default {
             document.querySelector('svg').style.marginTop = '0'
             document.querySelector('ellipse').style.cy = '43'
             document.querySelector('ellipse').style.rx = '8'
+            axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${marker._latlng.lat}&lon=${marker._latlng.lng}`)
+            .then(function(response) {
+              locationInfo.innerHTML = response.data.display_name
+              console.log(response)
+              self.currentAdress = `${response.data.address.road} ${response.data.address.house_number}`
+              console.log(typeof(self.currentAdress));
+            })
+            .catch(function (error) {
+              // handle error
+              console.log(error);
+            })
           })
         }
       })
@@ -128,6 +165,9 @@ export default {
   align-items: center;
   justify-content: center;
   transition: 0.5s;
+  padding: 0 5px 0 10vw;
+  box-sizing: border-box;
+  text-align: center;
 }
 .leaflet-marker-icon{
   visibility: hidden;

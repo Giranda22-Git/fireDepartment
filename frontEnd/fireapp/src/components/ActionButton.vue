@@ -9,7 +9,7 @@
         </div>
         <div class="InfBx">
           <h6>Текущий адрес</h6>
-          <h6 class="adress">Какой-то адрес</h6>
+          <h6 class="adress">{{LocalAdress}}</h6>
         </div>
         <div class="ChInfBx">
           <div class="sucBtn" @click = "completeAdress">
@@ -20,7 +20,19 @@
       </div>
       <div class="button" @click="nextStep">Далее</div>
       <q-separator />
-      <div class="sa">Поиск по месту</div>
+      <div class="secondPart">
+        <q-input
+          color = "indigo-6"
+          label-color = "grey"
+          clearable
+          v-model="LocalAdress"
+          label="Адрес"
+          >
+          <template v-slot:prepend>
+            <q-avatar icon="call" font-size="22px" />
+          </template>
+        </q-input>
+      </div>
     </div>
       <q-item-section v-if="next==true">
         <q-icon @click.stop="closeNext" id="icon" name="arrow_back" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}; font-size: 25px;`" />
@@ -40,13 +52,23 @@
 export default {
   name: 'LeftDrower',
   props:{
-    IsTurned: Boolean
+    IsTurned: Boolean,
+    Adress: String
   },
+  watch:{
+  Adress(oldV, newV){
+     this.LocalAdress = oldV
+  }
+},
   data () {
     return {
       stage: 1,
-      next: false
+      next: false,
+      LocalAdress: ''
     }
+  },
+  Beforemount(){
+    this.LocalAdress = this.Adress
   },
   methods:{
     actionButtonPressed(){
@@ -217,7 +239,6 @@ h6{
 }
 .button{
   width: 70%;
-  margin: 10% auto;
   padding: 1.7vh 0 1.7vh 0;
   background:#e85537;
   border-radius: 20px;
@@ -240,6 +261,13 @@ h6{
   border: none;
   outline: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.adress{
+  min-height: 3em;
+  line-height: 1.2em;;
+}
+.imgBx{
+  max-height: 50px;
 }
 @keyframes CBAppearing{
   0%{

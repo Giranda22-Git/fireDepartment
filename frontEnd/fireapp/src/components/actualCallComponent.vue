@@ -30,15 +30,16 @@ export default {
     HideParent(){
       document.querySelector('.mainPage').style.opacity = '0'
       setTimeout(() => {
+        this.$router.push('/')
         this.lastMsg = true
         document.querySelector('.lastMsg').style.opacity = '1'
         setTimeout(() => {
           document.querySelector('.content').style.opacity = '0'
           setTimeout(() => {
             this.$emit('HideModal')
-          }, 1000);
-        }, 1000);
-      }, 1000);
+          }, 2000);
+        }, 2000);
+      }, 2000);
 
     }
   }
@@ -53,7 +54,7 @@ export default {
     height: 100vh;
     z-index: 40;
     background-color: #e85537;
-    transition: 1s;
+    transition: 2s;
 }
 h2,
 h4,
@@ -99,11 +100,11 @@ h4{
   justify-content: center;
   width: 100%;
   height: 100%;
-  transition: 1s;
+  transition: 2s;
   pointer-events: none;
   opacity: 0;
 }
 .mainPage{
-  transition: 1s;
+  transition: 2s;
 }
 </style>

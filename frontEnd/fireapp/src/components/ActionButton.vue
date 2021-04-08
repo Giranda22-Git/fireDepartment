@@ -1,24 +1,26 @@
 <template>
   <div id="main" v-if="IsTurned" class="main">
     <div class = 'actionButton' @click = "actionButtonPressed">Вызвать Пожарных</div>
-    <div v-touch-swipe="swipeAction" class="contentBlock" id="contentBlock" v-if="stage>1" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}`">
-      <h6 class="title">Укажите адрес</h6>
-      <div class = "currentPos">
-        <div class="imgBx">
-          <svg width="29" height="47" viewBox="0 0 29 47" fill="none" xmlns="http://www.w3.org/2000/svg"><g filter="url(#filter0_f)"><ellipse cx="15" cy="43" rx="8" ry="2" fill="black" fill-opacity="0.1"/></g><line x1="15" y1="28" x2="15" y2="42" stroke="#FF2600" stroke-width="2" stroke-linecap="round"/><circle cx="14.5" cy="14.5" r="14.5" fill="#FF583B"/><circle cx="14.5" cy="14.5" r="6.5" fill="#FFCC81"/><defs><filter id="filter0_f" x="5" y="39" width="20" height="8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="1" result="effect1_foregroundBlur"/></filter></defs></svg>
-        </div>
-        <div class="InfBx">
-          <h6>Текущий адрес</h6>
-          <h6 class="adress">{{LocalAdress}}</h6>
-        </div>
-        <div class="ChInfBx">
-          <div class="sucBtn" @click = "completeAdress">
-            <div v-if="stage==2">Указать</div>
-            <div v-else @click.stop="closeTab">Карта</div>
+    <div v-touch-swipe="swipeAction" class="contentBlock" id="contentBlock" v-show="stage>1" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}`">
+      <div style = "min-height: calc(35vh - 7%)">
+        <h6 class="title">Укажите адрес</h6>
+        <div class = "currentPos">
+          <div class="imgBx">
+            <svg width="29" height="47" viewBox="0 0 29 47" fill="none" xmlns="http://www.w3.org/2000/svg"><g filter="url(#filter0_f)"><ellipse cx="15" cy="43" rx="8" ry="2" fill="black" fill-opacity="0.1"/></g><line x1="15" y1="28" x2="15" y2="42" stroke="#FF2600" stroke-width="2" stroke-linecap="round"/><circle cx="14.5" cy="14.5" r="14.5" fill="#FF583B"/><circle cx="14.5" cy="14.5" r="6.5" fill="#FFCC81"/><defs><filter id="filter0_f" x="5" y="39" width="20" height="8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="1" result="effect1_foregroundBlur"/></filter></defs></svg>
+          </div>
+          <div class="InfBx">
+            <h6>Текущий адрес</h6>
+            <h6 class="adress">{{LocalAdress}}</h6>
+          </div>
+          <div class="ChInfBx">
+            <div class="sucBtn" @click = "completeAdress">
+              <div id = 'openAllPage' v-if="stage==2">Указать</div>
+              <div v-else @click.stop="closeTab">Карта</div>
+            </div>
           </div>
         </div>
+        <div class="button" @click="nextStep">Далее</div>
       </div>
-      <div class="button" @click="nextStep">Далее</div>
       <q-separator />
       <div class="secondPart">
         <q-input
@@ -29,7 +31,7 @@
           label="Адрес"
           >
           <template v-slot:prepend>
-            <q-avatar icon="call" font-size="22px" />
+            <q-avatar icon="place" font-size="28px" />
           </template>
         </q-input>
       </div>
@@ -73,27 +75,48 @@ export default {
   methods:{
     actionButtonPressed(){
       this.stage += 1
-      document.getElementById('main').style.height = '30vh'
+      document.getElementById('main').style.height = '35vh'
+      document.getElementById('contentBlock').style.bottom = '0'
+      setTimeout(() => {
+        this.turnBubbling()
+      }, 100);
     },
     completeAdress(){
       this.stage += 1
       document.getElementById('main').style.height = '95vh'
+    },
+    turnBubbling(){
+      var containBlock = document.getElementById('contentBlock')
+      var but = document.querySelector('.actionButton')
+      var openAllPage = document.querySelector('.openAllPage')
+      var self = this
+      document.getElementById('MPage').addEventListener('click', function(e){
+        console.log(e.target);
+        if(self.next == true || e.target == openAllPage || e.target == containBlock || containBlock.contains(e.target) || e.target == but){
+        }else{
+          console.log(containBlock.contains(e.target));
+          self.bubblingCloseTab()
+        }
+      })
     },
     swipeAction({ evt, ...info }){
       console.log(info)
       if(info?.direction == 'up' && info?.duration > 40){
         this.completeAdress()
       } else if(info.direction == 'down' && info?.duration > 40){
-        if(document.getElementById('main').style.height == '30vh'){
-          setTimeout(() => {
-            this.stage = 1
-            document.getElementById('main').style.height = '10vh'
-          }, 550);
-          document.getElementById('contentBlock').style.bottom = '-100%'  
-        } else {
-          this.stage -= 1
-          document.getElementById('main').style.height = '30vh'
-        }
+        this.bubblingCloseTab()
+      }
+    },
+    bubblingCloseTab(){
+      if(document.getElementById('main').style.height == '35vh'){
+        setTimeout(() => {
+          this.stage = 1
+          document.getElementById('main').style.height = '10vh'
+        }, 550);
+        document.getElementById('contentBlock').style.bottom = '-100%'  
+      } else {
+        this.stage -= 1
+        document.getElementById('main').style.height = '35vh'
       }
     },
     closeTab(){
@@ -115,7 +138,7 @@ export default {
       this.closeTab()
       setTimeout(() => {
         this.next = true;
-        document.getElementById('main').style.height = '40vh'
+        document.getElementById('main').style.height = '45vh'
       }, 550);
     },
     fireCall(){
@@ -148,6 +171,7 @@ h6{
   margin-block-start: 0;
   margin-block-end: 0;
   font-size: 1.5em;
+  line-height: 1.6em;
 }
 .actionButton{
   position: absolute;
@@ -169,7 +193,7 @@ h6{
   width: 100%;
   height: 100%;
   transition: 0.5s;
-  padding: 7%;
+  padding: 5% 7% 5% 7%;
   bottom: 0;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -210,6 +234,7 @@ h6{
   align-items: center;
   justify-content: center;
   flex-direction: row;
+  min-height: 13vh;
 }
 .currentPos .imgBx{
   width: 10%;
@@ -264,7 +289,6 @@ h6{
 }
 .adress{
   min-height: 3em;
-  line-height: 1.2em;;
 }
 .imgBx{
   max-height: 50px;

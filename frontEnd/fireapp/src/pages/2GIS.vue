@@ -1,6 +1,6 @@
 <template>
 
-  <q-page class='flex flex-center'>
+  <q-page id = "MPage" class='flex flex-center'>
     <div id='location'>Your position:</div>
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>

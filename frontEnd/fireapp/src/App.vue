@@ -3,7 +3,7 @@
     <transition :name="transitionName">
       <router-view />
     </transition>
-    <actualCall v-if="status == 'saver' && call.adress == 'SomeAdress' && isModal" :Adress="call.adress" @HideModal = "HideModal"/>
+    <actualCall v-if="isLoggedIn && status == 'saver' && call.adress == 'SomeAdress' && isModal" :Adress="call.adress" @HideModal = "HideModal"/>
   </div>
 </template>
 
@@ -39,7 +39,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters(['status']),
+    ...mapGetters(['status','isLoggedIn']),
     theme(){
       return this.$store.state.theme
     },

@@ -52,7 +52,7 @@ export default {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 40;
+    z-index: 2003;
     background-color: #e85537;
     transition: 2s;
 }

@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-btn
-      style="position: absolute; z-index: 30"
+      style="position: absolute; z-index: 2002;"
       flat
       dense
       round
@@ -49,24 +49,12 @@ export default {
   data () {
     return {
       leftDrawerOpen: false,
-      essentialLinks: [
-      {
-        title: '2GIS',
-        caption: '2gis maps',
-        icon: 'public',
-        link: '/#/'
-      },
-      {
-        title: 'Settings',
-        caption: 'Settings',
-        icon: 'settings',
-        link: '/#/settings'
-      }]
+      essentialLinks: []
     }
   },
   beforeMount(){
     if(this.status == 'person'){
-      this.essentialLinks = [
+      return this.essentialLinks = [
       {
         title: '2GIS',
         caption: '2gis maps',
@@ -135,6 +123,9 @@ export default {
 </script>
 
 <style>
+*{
+  box-sizing: border-box;
+}
 .userName{
   margin: 1vw;
   font-size: 1.4em;

@@ -3,7 +3,9 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const multer = require('multer')
-const wss = require('ws')
+const WebSocket = require('ws')
+const wsClient = new WebSocket.Server({ port: 1000 })
+const { uid } = require('uid')
 
 //const User = require('./objects/User.js')
 //const mongoFreshAuction = require('./models/FreshAuctions.js').mongoFreshAuction
@@ -25,6 +27,8 @@ app.use((req, res, next) => {
 })
 app.use(cors())
 
+let clients = new Set()
+
 init(serverData)
 
 async function init(serverData) {
@@ -42,5 +46,31 @@ async function init(serverData) {
         app.use('/users', require('./endPoints/users.js'))
         //app.use('/auctions', require('./endPoints/auctions.js'))
     })
+
+    // web socket client connection
+    wsClient.on('connection', async (client, data) => {
+        const newClient = {
+            uid: uid(10),
+            connection: client,
+            phoneNumber: data.url.substring(1)
+        }
+
+        clients.add(newClient)
+        console.log(`connected client: \nuid: ${newClient.uid}\nphoneNumber: ${newClient.phoneNumber}`)
+
+        client.on('message', async msg => {
+
+            // registration new fire
+            if (msg.action === 'newFire') {
+
+            }
+        })
+
+        client.on('close', () => {
+            clients.delete(newClient)
+            console.log(`deleted: ${newClient.uid}`)
+        })
+    })
+
     mongoose.connection.emit('open')
 }

@@ -7,10 +7,6 @@ const WebSocket = require('ws')
 const wsClient = new WebSocket.Server({ port: 1000 })
 const { uid } = require('uid')
 
-//const User = require('./objects/User.js')
-//const mongoFreshAuction = require('./models/FreshAuctions.js').mongoFreshAuction
-//const mongoUser = require('./models/Users.js').mongoUser
-
 const serverData = {
     mongoUrl: 'mongodb://localhost:27017/fireDepartment',
     serverUrl: 'http://localhost:3000/',
@@ -59,10 +55,18 @@ async function init(serverData) {
         console.log(`connected client: \nuid: ${newClient.uid}\nphoneNumber: ${newClient.phoneNumber}`)
 
         client.on('message', async msg => {
-
+            msg = JSON.parse(msg)
             // registration new fire
             if (msg.action === 'newFire') {
-
+                const newMessage = {
+                    action: 'registeredNewFire',
+                    agent: 'server',
+                    data: {
+                        date: new Date,
+                        address: msg.data.address
+                    }
+                }
+                sendAll(newMessage)
             }
         })
 
@@ -73,4 +77,10 @@ async function init(serverData) {
     })
 
     mongoose.connection.emit('open')
+
+    function sendAll (message) {
+        clients.forEach(client => {
+            client.connection.send(JSON.stringify(message))
+        })
+    }
 }

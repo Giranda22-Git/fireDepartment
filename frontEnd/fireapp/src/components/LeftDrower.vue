@@ -53,7 +53,7 @@ export default {
     }
   },
   beforeMount(){
-    if(this.status == 'person'){
+    if(this.status == 'ordinary'){
       return this.essentialLinks = [
       {
         title: '2GIS',
@@ -117,6 +117,9 @@ export default {
     },
     theme(){
       return this.$store.state.theme
+    },
+    status(){
+      return this.$store.state.status
     }
   }
 }

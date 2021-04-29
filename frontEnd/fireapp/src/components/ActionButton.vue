@@ -34,6 +34,9 @@
             <q-avatar icon="place" font-size="28px" />
           </template>
         </q-input>
+        <div v-for="(el,i) in SuggestedVars" :key=i>
+          <div v-if="LocalAdress && el.full_name && el.address_name" class="AdressButton" @click="LocalAdress= el.full_name || el.address_name">{{el.full_name || el.address_name}}</div>
+        </div>
       </div>
     </div>
       <q-item-section v-if="next==true">
@@ -50,23 +53,37 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 export default {
   name: 'LeftDrower',
   props:{
     IsTurned: Boolean,
-    Adress: String
+    Adress: String,
+    Coords: Array
   },
   watch:{
-  Adress(oldV, newV){
-     this.LocalAdress = oldV
-  }
+  Adress(newV, oldV){
+    this.LocalAdress = newV
+  },
+  LocalAdress(newV, oldV){
+    console.log(1);
+    var self = this
+    axios.get(`https://catalog.api.2gis.com/3.0/suggests?q=${newV}&sort_point=${this.Coords[0]},${this.Coords[1]}&key=ruhwrq0201`)
+    .then(function(response) {
+      self.SuggestedVars = response.data?.result?.items.filter((card,index) => index < 6)
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+  },
 },
   data () {
     return {
       stage: 1,
       next: false,
-      LocalAdress: ''
+      LocalAdress: '',
+      SuggestedVars: null
     }
   },
   Beforemount(){
@@ -90,20 +107,21 @@ export default {
       var but = document.querySelector('.actionButton')
       var openAllPage = document.querySelector('.openAllPage')
       var self = this
-      document.getElementById('MPage').addEventListener('click', function(e){
+      document.querySelector('body').addEventListener('click', function(e){
         console.log(e.target);
         if(self.next == true || e.target == openAllPage || e.target == containBlock || containBlock.contains(e.target) || e.target == but){
+          console.log(containBlock.contains(e.target));
         }else{
           console.log(containBlock.contains(e.target));
           self.bubblingCloseTab()
         }
-      })
+      },{once: true})
     },
     swipeAction({ evt, ...info }){
       console.log(info)
-      if(info?.direction == 'up' && info?.duration > 40){
+      if(info?.direction == 'up' && info?.duration > 30){
         this.completeAdress()
-      } else if(info.direction == 'down' && info?.duration > 40){
+      } else if(info.direction == 'down' && info?.duration > 30){
         this.bubblingCloseTab()
       }
     },
@@ -292,6 +310,17 @@ h6{
 }
 .imgBx{
   max-height: 50px;
+}
+.AdressButton{
+  width: 80%;
+  padding: 3px 5px 3px 5px;
+  font-size: 1rem;
+  border: 1px solid rgb(175, 19, 19);
+  background-color: #e85537;
+  border-radius: 10px;
+  color: white;
+  margin: 10px 0 10px 10%;
+  text-align: center;
 }
 @keyframes CBAppearing{
   0%{

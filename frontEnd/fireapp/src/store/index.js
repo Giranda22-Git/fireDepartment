@@ -9,7 +9,7 @@ export default new Vuex.Store({
       phone: localStorage.getItem('phone') || '',
       updated: false,
       theme: localStorage.getItem('theme') || 'white',
-      status: localStorage.getItem('status') || 'saver',
+      status: localStorage.getItem('status') || 'ordinary',
       actualCall: localStorage.getItem('actualCall') || {"adress": "SomeAdress"}
     },
     mutations: {

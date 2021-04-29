@@ -31,7 +31,7 @@ export default {
 }
 .pulse span {
   position: absolute;
-  top: 52%;
+  top: 45%;
   background-color: #b43131;
   border-radius: 50%;
   display: inline-block;

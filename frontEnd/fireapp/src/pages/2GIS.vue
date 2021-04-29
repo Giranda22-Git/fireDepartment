@@ -5,21 +5,24 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <div class="page-reload" @click="reload">Обновить карту</div>
-    <ActionButton :IsTurned="true" :Adress="currentAdress" @Search="Search"/>
+    <ActionButton :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @Search="Search"/>
     <PulseAnimation v-if="Searching == true" />
   </q-page>
 </template>
 
 <script>
+// <svg class = 'svg' width='35' height='90' viewBox='0 0 29 47' fill='none' xmlns='http://www.w3.org/2000/svg'><ellipse cx='15' cy='43' rx='8' ry='2' fill='black' fill-opacity='0.1'/><line x1='15' y1='28' x2='15' y2='42' stroke='#FF2600' stroke-width='2' stroke-linecap='round'/><circle cx='14.5' cy='14.5' r='14.5' fill='#FF583B'/><circle cx='14.5' cy='14.5' r='6.5' fill='#FFCC81'/><defs><filter id='filter0_f' x='5' y='39' width='20' height='8' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'><feFlood flood-opacity='0' result='BackgroundImageFix'/><feBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape'/><feGaussianBlur stdDeviation='1' result='effect1_foregroundBlur'/></filter></defs></svg>
 import ActionButton from '../components/ActionButton.vue'
 import PulseAnimation from '../components/PulseAnimation.vue'
 import axios from 'axios'
+// import mapgl from '@2gis/mapgl'
 export default {
   name: 'TwoGis',
   data(){
     return{
       Searching: false,
-      currentAdress: 'Ваш Адрес не определен'
+      currentAdress: 'Ваш Адрес не определен',
+      currentCoords: null
     }
   },
   watch:{
@@ -28,89 +31,108 @@ export default {
     }
   },
   mounted () {
-const options = {
-  method: 'GET',
-  url: 'https://forward-reverse-geocoding.p.rapidapi.com/v1/forward',
-  params: {
-    format: 'json',
-    street: 'Бухар Жирау 27/5',
-    city: 'Алматы',
-    'accept-language': 'кг',
-    polygon_threshold: '0.0'
-  },
-  headers: {
-    'x-rapidapi-key': '0b0c351161msh5424ed2f45f6310p18a96bjsn3bdcf8c12636',
-    'x-rapidapi-host': 'forward-reverse-geocoding.p.rapidapi.com'
-  }
-};
-
-axios.request(options).then(function (response) {
-	console.log(response.data);
-}).catch(function (error) {
-	console.error(error);
-});
-
     this.activateButton()
     this.forceUpdate()
     this.checkTheme()
-    var map, marker
+    var marker
+    var map
     var self = this
     var locationInfo = document.getElementById('location')
-    var DG = require('2gis-maps')
-    map = DG.map('map', {
-      center: [54.98, 82.89],
-      zoom: 13,
-      draggable: true,
-      zoomControl: false,
-      fullscreenControl: false
-    })
-    DG.control.traffic().addTo(map);
-    console.log(map);
-    map.locate({ setView: true, watch: true })
-      .on('locationfound', function (e) {
-        let myDivIcon = DG.divIcon({
-                    iconSize: [35, 1],
-                    html: "<svg class = 'svg' width='35' height='90' viewBox='0 0 29 47' fill='none' xmlns='http://www.w3.org/2000/svg'><ellipse cx='15' cy='43' rx='8' ry='2' fill='black' fill-opacity='0.1'/><line x1='15' y1='28' x2='15' y2='42' stroke='#FF2600' stroke-width='2' stroke-linecap='round'/><circle cx='14.5' cy='14.5' r='14.5' fill='#FF583B'/><circle cx='14.5' cy='14.5' r='6.5' fill='#FFCC81'/><defs><filter id='filter0_f' x='5' y='39' width='20' height='8' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'><feFlood flood-opacity='0' result='BackgroundImageFix'/><feBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape'/><feGaussianBlur stdDeviation='1' result='effect1_foregroundBlur'/></filter></defs></svg>"
-                });
-        if (!marker) {
-          marker = DG.marker([e.latitude, e.longitude], {
-            draggable: false,
-            icon: myDivIcon
-          }).addTo(map)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(success)
+    }
+    
+    function success(pos) {
+      const center = [pos.coords.longitude, pos.coords.latitude];
 
-          map.on('move', function (e) {
-            marker.setLatLng([map.getCenter().lat, map.getCenter().lng])
-            // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
-          })
-          map.on('movestart', function(){
-            document.querySelector('svg').style.marginTop = '-20px'
-            document.querySelector('ellipse').style.cy = '60'
-            document.querySelector('ellipse').style.rx = '12'
-          })
-          map.on('moveend', function(){
-            document.querySelector('svg').style.marginTop = '0'
-            document.querySelector('ellipse').style.cy = '43'
-            document.querySelector('ellipse').style.rx = '8'
-            axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${marker._latlng.lat}&lon=${marker._latlng.lng}`)
-            .then(function(response) {
-              locationInfo.innerHTML = response.data.display_name
-              console.log(response)
-              self.currentAdress = `${response.data.address.road} ${response.data.address.house_number}`
-              console.log(typeof(self.currentAdress));
-            })
-            .catch(function (error) {
-              // handle error
-              console.log(error);
-            })
-          })
-        }
+      map = new mapgl.Map('map', {
+        key: '519f87ba-c90a-4500-9c57-71034960435b',
+        center: center,
+        zoom: 18,
+        draggable: true,
+        zoomControl: false,
+        fullscreenControl: false
+      });
+      map.setCenter(center)
+      // map.showTraffic()
+      marker = new mapgl.Marker(map, {
+        coordinates: map.getCenter()
+      });
+      self.currentCoords = map.getCenter()
+      getReturnGeocoding()
+      map.on('move', function (e) {
+        marker.setCoordinates(map.getCenter())
+        // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
       })
-      .on('locationerror', function (e) {
-        DG.popup()
-          .setLatLng(map.getCenter())
-          .setContent('Доступ к определению местоположения отключён')
-          .openOn(map)
+      map.on('movestart', function(){
+        document.querySelector('svg').style.marginTop = '-20px'
+        document.querySelector('ellipse').style.cy = '60'
+        document.querySelector('ellipse').style.rx = '12'
       })
+      map.on('moveend', function(){
+        document.querySelector('svg').style.marginTop = '0'
+        document.querySelector('ellipse').style.cy = '43'
+        document.querySelector('ellipse').style.rx = '8'
+        getReturnGeocoding()
+      })
+////////////////////////////
+        const directions = new mapgl.Directions(map, {
+            directionsApiKey: 'ruhwrq0201',
+        });
+        const markers = [];
+
+        let firstPoint;
+        let secondPoint;
+        // A current selecting point
+        let selecting = 'a';
+
+        map.on('click', (e) => {
+          const coords = e.lngLat;
+
+          if (selecting != 'end') {
+              // Just to visualize selected points, before the route is done
+              markers.push(
+                  new mapgl.Marker(map, {
+                      coordinates: coords,
+                      icon: 'https://docs.2gis.com/img/dotMarker.svg',
+                  }),
+              );
+          }
+
+          if (selecting === 'a') {
+              firstPoint = coords;
+              selecting = 'b';
+          } else if (selecting === 'b') {
+              secondPoint = coords;
+              selecting = 'end';
+          }
+
+          // If all points are selected — we can draw the route
+          if (firstPoint && secondPoint) {
+              directions.carRoute({
+                  points: [firstPoint, secondPoint],
+              });
+               marker.hide()
+              markers.forEach((m) => {
+                  m.destroy();
+              });
+          }
+        });
+    }
+
+    function getReturnGeocoding(){
+      axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${map.getCenter()[0]}&lat=${map.getCenter()[1]}&fields=items.point&key=ruhwrq0201`)
+        .then(function(response) {
+          locationInfo.innerHTML = response.data.result.items[0].address_name || response.data.result.items[0].full_name
+          // console.log(response)
+          self.currentAdress = response.data.result.items[0].address_name || response.data.result.items[0].full_name
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        })
+    }
+    // map.getCenter
   },
   methods:{
     forceUpdate(){

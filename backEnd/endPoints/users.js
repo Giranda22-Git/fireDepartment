@@ -16,7 +16,6 @@ router.post('/', async (req, res) => {
     try {
         const data = req.body
         const isUser = await mongoUser.findOne({ 'Login._login': data.Login }).exec()
-        console.log(isUser)
         if (isUser) res.status(200).send( JSON.stringify( isUser ) )
         else {
             const newUser = new mongoUser({

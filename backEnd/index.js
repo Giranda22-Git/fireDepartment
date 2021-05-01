@@ -7,6 +7,8 @@ const WebSocket = require('ws')
 const wsClient = new WebSocket.Server({ port: 1000 })
 const { uid } = require('uid')
 
+const mongoCurrentFire = require('./models/currentFire.js').mongoFire
+
 const serverData = {
     mongoUrl: 'mongodb://localhost:27017/fireDepartment',
     serverUrl: 'http://localhost:3000/',
@@ -40,7 +42,7 @@ async function init(serverData) {
         })
 
         app.use('/users', require('./endPoints/users.js'))
-        //app.use('/auctions', require('./endPoints/auctions.js'))
+        app.use('/verification', require('./endPoints/verification.js'))
     })
 
     // web socket client connection
@@ -56,6 +58,7 @@ async function init(serverData) {
 
         client.on('message', async msg => {
             msg = JSON.parse(msg)
+            console.log(msg)
             // registration new fire
             if (msg.action === 'newFire') {
                 const newMessage = {
@@ -66,6 +69,14 @@ async function init(serverData) {
                         address: msg.data.address
                     }
                 }
+
+                const newCurrentFire = new mongoCurrentFire({
+                    address: msg.data.address,
+                    causing: msg.data.causing
+                })
+
+                await newCurrentFire.save()
+
                 sendAll(newMessage)
             }
         })

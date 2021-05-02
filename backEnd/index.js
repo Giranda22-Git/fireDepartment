@@ -66,6 +66,7 @@ async function init(serverData) {
                     agent: 'server',
                     data: {
                         date: new Date,
+                        causing: msg.data.causing,
                         address: msg.data.address
                     }
                 }

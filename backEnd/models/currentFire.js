@@ -23,5 +23,5 @@ const fire = new mongoose.Schema({
     }
 })
 
-const mongoFire = mongoose.model('fires', fire)
+const mongoFire = mongoose.model('currentfires', fire)
 module.exports = { mongoFire }

@@ -20,6 +20,11 @@ const user = new mongoose.Schema({
     HistoryLog: {
         type: Array,
         default: []
+    },
+    typeOfUser: {
+        type: String,
+        enum: [ 'user', 'fireman' ],
+        default: 'user'
     }
 })
 

@@ -1,49 +1,32 @@
 const express = require('express')
 const router = express.Router()
-const axios = require('axios')
 
-const mongoVerification = require('../models/freshVerification.js').mongoVerification
+const mongoFireDepartment = require('../models/fireDepartment.js').mongoFireDepartment
 
 router.get('/', async (req, res) => {
-    const result = await mongoVerification.find().exec()
+    const result = await mongoFireDepartment.find().exec()
     res.status(200).send( JSON.stringify(result) )
 })
 
-// begin create verification code
+// begin create fireDepartment code
 
 router.post('/', async (req, res) => {
+    const data = req.body
 
-    const tryAgain = await mongoVerification.findOne({ phoneNumber: req.body.phoneNumber }).exec()
-
-    if (tryAgain)
-        await mongoVerification.deleteOne({ phoneNumber: req.body.phoneNumber }).exec()
-
-    const code = generateCode()
-
-    const newfreshVerification = new mongoVerification({
-        phoneNumber: req.body.phoneNumber,
-        verificationCode: code
+    const newFireDepartment = new mongoFireDepartment({
+        numberOfFireDepartment: data.numberOfFireDepartment,
+        city: data.city,
+        region: data.region,
+        address: data.address
     })
 
-    const result = await newfreshVerification.save()
-
-    const params = {
-        login: 'Giranda22',
-        psw: 'Kv7zTusHymtE95m',
-        phones: req.body.phoneNumber,
-        mes: `код подтверждения ${code}`
-    }
-
-    const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
-
-    await axios.get(encodeURI(URI))
-
+    const result = await newFireDepartment.save()
     res.status(200).json(result)
 })
 /*
 TEST:
 
-POST http://localhost:3000/verification/ HTTP/1.1
+POST http://localhost:3000/fireDepartment/ HTTP/1.1
 content-type: application/json
 
 {
@@ -52,7 +35,7 @@ content-type: application/json
 
 */
 
-// end create verification code
+// end create fireDepartment code
 
 
 // begin verify user

@@ -1,43 +1,26 @@
 const express = require('express')
 const router = express.Router()
-const axios = require('axios')
 
-const mongoVerification = require('../models/freshVerification.js').mongoVerification
+const mongoBrigade = require('../models/fireBrigade.js').mongoBrigade
 
 router.get('/', async (req, res) => {
-    const result = await mongoVerification.find().exec()
+    const result = await mongoBrigade.find().exec()
     res.status(200).send( JSON.stringify(result) )
 })
 
 // begin create verification code
 
 router.post('/', async (req, res) => {
+    const data = req.body
 
-    const tryAgain = await mongoVerification.findOne({ phoneNumber: req.body.phoneNumber }).exec()
-
-    if (tryAgain)
-        await mongoVerification.deleteOne({ phoneNumber: req.body.phoneNumber }).exec()
-
-    const code = generateCode()
-
-    const newfreshVerification = new mongoVerification({
-        phoneNumber: req.body.phoneNumber,
-        verificationCode: code
+    const newBrigade = new mongoBrigade({
+        numberOfFireBrigade: data.numberOfFireBrigade,
+        pertainFireDepartment: data.pertainFireDepartment,
+        team: data.team,
+        city: data.city
     })
 
-    const result = await newfreshVerification.save()
-
-    const params = {
-        login: 'Giranda22',
-        psw: 'Kv7zTusHymtE95m',
-        phones: req.body.phoneNumber,
-        mes: `код подтверждения ${code}`
-    }
-
-    const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
-
-    await axios.get(encodeURI(URI))
-
+    const result = await newBrigade.save()
     res.status(200).json(result)
 })
 /*

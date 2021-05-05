@@ -2,7 +2,7 @@
   <div class="wrapper">
 		<div class="authForm">
 			<span> Login </span>
-			<input v-model="phoneNumber" type="text" class="phoneNumber" v-mask="{mask: '+7(999) 999-99-99'}" placeholder="phone number">
+			<input v-model="phoneNumber" type="text" class="phoneNumber" v-mask="{mask: '+7(999)999-99-99'}" placeholder="phone number">
 			<button @click="send" class="send">Send</button>
 			<br><br>
 			<span> Verify code </span>

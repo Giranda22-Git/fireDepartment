@@ -45,7 +45,7 @@ async function init(serverData) {
         app.use('/verification', require('./endPoints/verification.js'))
     })
 
-    // web socket client connection
+    // begin WebSocket Client connection
     wsClient.on('connection', async (client, data) => {
         const newClient = {
             uid: uid(10),
@@ -87,6 +87,7 @@ async function init(serverData) {
             console.log(`deleted: ${newClient.uid}`)
         })
     })
+    // end WebSocket Client connection
 
     mongoose.connection.emit('open')
 

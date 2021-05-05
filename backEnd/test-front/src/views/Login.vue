@@ -66,7 +66,7 @@ export default {
               icon: 'success',
               confirmButtonText: 'Войти'
             }).then(() => {
-              window.location.href = 'http://localhost:8080/menu'
+              window.location.href = 'http://localhost:8080/menu/' + this.phoneNumber
             })
           }
         })

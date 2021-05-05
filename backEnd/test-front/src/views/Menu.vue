@@ -1,6 +1,5 @@
 <template>
   <div class="wrapper">
-		<input type="text" class="phoneNumber" v-model="phoneNumber" v-mask="{ mask: '+7(999) 999-99-99' }">
 		<div class="form">
 			<span> New Fire </span>
 			<input type="text" class="address" placeholder="address" v-model="newFireAddress">
@@ -11,7 +10,7 @@
 
 <script>
 import axios from 'axios'
-const connection = new WebSocket('ws://localhost:1000/+7(705)553-99-66')
+
 export default {
 	name: 'Menu',
 	data: () => ({
@@ -19,6 +18,8 @@ export default {
 		phoneNumber: null
 	}),
 	mounted () {
+		this.phoneNumber = this.$route.params.phoneNumber
+		const connection = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
 		connection.onmessage = async msg => {
 			msg = JSON.parse(msg.data)
 			console.log(msg)

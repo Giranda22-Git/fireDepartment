@@ -10,7 +10,7 @@
 
 <script>
 import axios from 'axios'
-
+let connection = null
 export default {
 	name: 'Menu',
 	data: () => ({
@@ -19,7 +19,7 @@ export default {
 	}),
 	mounted () {
 		this.phoneNumber = this.$route.params.phoneNumber
-		const connection = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
+		connection = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
 		connection.onmessage = async msg => {
 			msg = JSON.parse(msg.data)
 			console.log(msg)

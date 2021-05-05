@@ -43,6 +43,8 @@ async function init(serverData) {
 
         app.use('/users', require('./endPoints/users.js'))
         app.use('/verification', require('./endPoints/verification.js'))
+        app.use('/fireDepartment', require('./endPoints/fireDepartments.js'))
+        app.use('/fireBrigade', require('./endPoints/fireBrigades.js'))
     })
 
     // begin WebSocket Client connection

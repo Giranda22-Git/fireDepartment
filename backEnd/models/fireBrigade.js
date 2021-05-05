@@ -6,7 +6,7 @@ const brigade = new mongoose.Schema({
     },
     pertainFireDepartment: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+        default: ''
     },
     team: {
         type: [mongoose.Schema.Types.ObjectId],

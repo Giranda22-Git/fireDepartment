@@ -2,13 +2,14 @@ const express = require('express')
 const router = express.Router()
 
 const mongoFireDepartment = require('../models/fireDepartment.js').mongoFireDepartment
+const mongoBrigade = require('../models/fireBrigade.js').mongoBrigade
 
 router.get('/', async (req, res) => {
     const result = await mongoFireDepartment.find().exec()
     res.status(200).send( JSON.stringify(result) )
 })
 
-// begin create fireDepartment code
+// begin create fireDepartment
 
 router.post('/', async (req, res) => {
     const data = req.body
@@ -30,20 +31,25 @@ POST http://localhost:3000/fireDepartment/ HTTP/1.1
 content-type: application/json
 
 {
-    "phoneNumber": "8(705)553-99-66"
+    "numberOfFireDepartment": "12",
+    "city": "Almaty",
+    "region": "Жетысуский",
+    "address": "микрорайон Дорожник, 27а"
 }
 
 */
 
-// end create fireDepartment code
+// end create fireDepartment
 
 
 // begin verify user
 
-router.post('/verify', async (req, res) => {
+router.post('/binding', async (req, res) => {
     const data = req.body
 
-    const code = await mongoVerification.findOne({ phoneNumber: data.phoneNumber }).exec()
+    const code = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
+        $push: { brigades: data.brigades }
+    }).exec()
 
     if (code.verificationCode === data.verificationCode) {
         await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()

@@ -26,11 +26,16 @@ router.post('/', async (req, res) => {
 /*
 TEST:
 
-POST http://localhost:3000/verification/ HTTP/1.1
+POST http://localhost:3000/fireBrigade/ HTTP/1.1
 content-type: application/json
 
 {
-    "phoneNumber": "8(705)553-99-66"
+    "numberOfFireBrigade": "1",
+    "pertainFireDepartment": "6092b1ff4d550c0acc655f29",
+    "team": [
+        "60929f9c229ffb3d08ee11aa"
+    ],
+    "city": "Almaty"
 }
 
 */

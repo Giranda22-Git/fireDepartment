@@ -42,39 +42,50 @@ content-type: application/json
 // end create fireDepartment
 
 
-// begin verify user
+// begin binding
 
 router.post('/binding', async (req, res) => {
     const data = req.body
 
-    const code = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
+    const resultUpdateDepartment = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
         $push: { brigades: data.brigades }
     }).exec()
 
-    if (code.verificationCode === data.verificationCode) {
-        await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
-        await axios.post('http://localhost:3000/users', { Login: data.phoneNumber })
-        res.send({result: true})
+    const resultUpdateBrigade = await mongoBrigade.updateOne({ _id: data.brigadeId }, {
+        pertainFireDepartment: data.departmentId
+    })
+
+    const results = {
+        resultUpdateBrigade,
+        resultUpdateDepartment
     }
-    else
-        res.send({result: false})
+
+    res.status(200).send(results)
 })
 /*
 TEST:
 
-POST http://localhost:3000/verification/verify HTTP/1.1
+POST http://localhost:3000/fireDepartment/binding HTTP/1.1
 content-type: application/json
 
 {
-    "phoneNumber": "8(705)553-99-66",
-    "verificationCode": "513995"
+    "departmentId": "60986a78f367175e92fbee02",
+    "brigadeId": "60987cb9bc2a9a6445d241fd",
+    "brigades": [
+        "60987cb9bc2a9a6445d241fd"
+    ]
 }
 
 */
-// end verify user
+// end binding
 
-function generateCode() {
-    return String(Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000)
-}
+// begin find fire department by id
+
+router.post('/findById', async (req, res) => {
+    const result = await mongoFireDepartment.findById(req.data.departmentId).exec()
+    res.status(200).send(result)
+})
+
+// end find fire department by id
 
 module.exports = router

@@ -5,11 +5,15 @@
 			<input type="text" class="address" placeholder="address" v-model="newFireAddress">
 			<button class="send" @click="newFireSend">Send</button>
 		</div>
+		<fireDepartmentForms class="newForm" />
+		<fireBrigadeForms class="newForm" />
 	</div>
 </template>
 
 <script>
 import axios from 'axios'
+import fireDepartmentForms from '../components/FireDepatmentForms.vue'
+import fireBrigadeForms from '../components/FireBrigadeForms.vue'
 let connection = null
 export default {
 	name: 'Menu',
@@ -41,6 +45,10 @@ export default {
       }
 			connection.send(JSON.stringify(message))
 		}
+	},
+	components: {
+		fireDepartmentForms,
+		fireBrigadeForms
 	}
 }
 </script>
@@ -60,4 +68,6 @@ export default {
 			align-items: center
 			& *
 				margin-top: 10%
+		.newForm
+			margin-top: 5%
 </style>

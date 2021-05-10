@@ -43,19 +43,31 @@ content-type: application/json
 
 
 // begin find User by id
-router.get('/id/:id', async (req, res) => {
-    try {
-        const result = await mongoUser.findById(req.params.id).exec()
-        res.status(200).json(result)
+router.post('/findById', async (req, res) => {
+    const data = req.body
+
+    let users = new Array
+    console.log(data)
+
+    for (i=0; i < data.users.length; i++) {
+        users.push(await mongoUser.findById(data.users[i]).exec())
     }
-    catch(err) {
-        res.sendStatus(500)
-    }
+
+    res.status(200).send(users)
 })
 /*
 TEST:
-GET http://localhost:3000/users/id/6061b9f32b8ff91a08fd7ee6 HTTP/1.1
+
+POST http://localhost:3000/users/findById HTTP/1.1
 content-type: application/json
+
+{
+    "users": [
+        "6092627ae5e6038bd44ec95d",
+        "6092627ae5e6038bd44ec95d",
+        "6092627ae5e6038bd44ec95d"
+    ]
+}
 */
 // end find User by id
 

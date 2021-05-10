@@ -6,8 +6,10 @@ const multer = require('multer')
 const WebSocket = require('ws')
 const wsClient = new WebSocket.Server({ port: 1000 })
 const { uid } = require('uid')
+const axios = require('axios')
 
 const mongoCurrentFire = require('./models/currentFire.js').mongoFire
+const mongoUser = require('./models/User.js').mongoUser
 
 const serverData = {
     mongoUrl: 'mongodb://localhost:27017/fireDepartment',
@@ -63,24 +65,74 @@ async function init(serverData) {
             console.log(msg)
             // registration new fire
             if (msg.action === 'newFire') {
-                const newMessage = {
-                    action: 'registeredNewFire',
-                    agent: 'server',
-                    data: {
-                        date: new Date,
-                        causing: msg.data.causing,
-                        address: msg.data.address
-                    }
-                }
-
                 const newCurrentFire = new mongoCurrentFire({
                     address: msg.data.address,
                     causing: msg.data.causing
                 })
 
-                await newCurrentFire.save()
+                const resultRegistrationNewFire = await newCurrentFire.save()
+
+                const newMessage = {
+                    action: 'registeredNewFire',
+                    agent: 'server',
+                    data: {
+                        resultRegistrationNewFire
+                    }
+                }
 
                 sendAll(newMessage)
+            }
+
+            // take call; FIXME: not verified !!!
+            if (msg.action === 'takeCall') {
+                const resultTakeCallCurrentFire =
+                    await mongoCurrentFire.updateOne(
+                        { _id: msg.data.currentFireId },
+                        { $push: { activeBrigades: msg.data.brigadeId } }
+                    )
+
+                const params = {
+                    brigadeId: msg.data.brigadeId,
+                    switch: false
+                }
+                await axios.post('http://localhost:3000/fireBrigade/switch', params)
+
+                const MessageForTakeCall = {
+                    action: 'fireTruckDispatched',
+                    agent: 'server',
+                    data: {
+                        updatedCurrentFireData: resultTakeCallCurrentFire,
+                    }
+                }
+
+                const currentFireDataForTakeCall = await mongoCurrentFire.findById(msg.data.currentFireId).exec()
+                const causingCurrentFireForTakeCall = await mongoUser.findById(currentFireDataForTakeCall.causing).exec()
+
+                for (let clientForTakeCall of clients) {
+                    if (clientForTakeCall.phoneNumber === causingCurrentFireForTakeCall.phoneNumber) {
+                        clientForTakeCall.connection.send(JSON.stringify(MessageForTakeCall))
+                    }
+                }
+            }
+
+            // update fire status; FIXME: not verified
+            if (msg.action === 'updateFireStatus') {
+                const resultFireDataForUpdateFireStatus = await mongoCurrentFire.updateOne(
+                    { _id: msg.data.currentFireId },
+                    { status: msg.data.status }
+                ).exec()
+
+                const MessageForUpdateFireStatus = {
+                    action: 'fireStatusUpdated',
+                    agent: 'server',
+                    data: {
+                        currentFireId: msg.data.currentFireId,
+                        newStatus: msg.data.status,
+                        result: resultFireDataForUpdateFireStatus
+                    }
+                }
+
+                sendAll(MessageForUpdateFireStatus)
             }
         })
 

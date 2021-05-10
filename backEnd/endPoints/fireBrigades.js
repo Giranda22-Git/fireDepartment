@@ -2,13 +2,14 @@ const express = require('express')
 const router = express.Router()
 
 const mongoBrigade = require('../models/fireBrigade.js').mongoBrigade
+const mongoFireDepartment = require('../models/fireDepartment.js').mongoFireDepartment
 
 router.get('/', async (req, res) => {
     const result = await mongoBrigade.find().exec()
     res.status(200).send( JSON.stringify(result) )
 })
 
-// begin create verification code
+// begin new Brigade
 
 router.post('/', async (req, res) => {
     const data = req.body
@@ -21,6 +22,9 @@ router.post('/', async (req, res) => {
     })
 
     const result = await newBrigade.save()
+    const updateFireDepartment = await mongoFireDepartment.updateOne({ _id: data.pertainFireDepartment }, {
+        $push: {brigades: result._id}
+    })
     res.status(200).json(result)
 })
 /*
@@ -31,49 +35,64 @@ content-type: application/json
 
 {
     "numberOfFireBrigade": "1",
-    "pertainFireDepartment": "6092b1ff4d550c0acc655f29",
+    "pertainFireDepartment": "60986a78f367175e92fbee02",
     "team": [
-        "60929f9c229ffb3d08ee11aa"
+        "6092627ae5e6038bd44ec95d"
     ],
     "city": "Almaty"
 }
 
 */
 
-// end create verification code
+// end new Brigade
 
 
-// begin verify user
+// begin find brigade by id
 
-router.post('/verify', async (req, res) => {
+router.post('/findById', async (req, res) => {
     const data = req.body
 
-    const code = await mongoVerification.findOne({ phoneNumber: data.phoneNumber }).exec()
+    let brigades = new Array
+    console.log(data)
 
-    if (code.verificationCode === data.verificationCode) {
-        await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
-        await axios.post('http://localhost:3000/users', { Login: data.phoneNumber })
-        res.send({result: true})
+    for (i=0; i < data.brigades.length; i++) {
+        brigades.push(await mongoBrigade.findById(data.brigades[i]).exec())
     }
-    else
-        res.send({result: false})
+
+    res.status(200).send(brigades)
 })
+
 /*
 TEST:
 
-POST http://localhost:3000/verification/verify HTTP/1.1
+POST http://localhost:3000/fireBrigade/findById HTTP/1.1
 content-type: application/json
 
 {
-    "phoneNumber": "8(705)553-99-66",
-    "verificationCode": "513995"
+    "brigades": [
+        "60987cb9bc2a9a6445d241fd",
+        "60987cb9bc2a9a6445d241fd",
+        "60987cb9bc2a9a6445d241fd"
+    ]
 }
 
 */
-// end verify user
+// end find brigade by id
 
-function generateCode() {
-    return String(Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000)
-}
+// begin update status
+
+router.post('/switch', async (req, res) => {
+    const data = req.body
+
+    if (data.switch) {
+        await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'available' })
+        res.status(200).send({ status: 'available' })
+    } else {
+        await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'unavailable' })
+        res.status(200).send({ status: 'unavailable' })
+    }
+})
+
+// end update status
 
 module.exports = router

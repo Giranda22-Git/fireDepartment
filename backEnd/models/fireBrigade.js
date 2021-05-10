@@ -12,6 +12,11 @@ const brigade = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
+    status: {
+        type: String,
+        enum: ['available', 'unavailable'],
+        default: 'unavailable'
+    },
     city: {
         type: String,
         required: true

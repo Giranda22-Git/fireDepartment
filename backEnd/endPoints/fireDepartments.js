@@ -5,24 +5,24 @@ const mongoFireDepartment = require('../models/fireDepartment.js').mongoFireDepa
 const mongoBrigade = require('../models/fireBrigade.js').mongoBrigade
 
 router.get('/', async (req, res) => {
-    const result = await mongoFireDepartment.find().exec()
-    res.status(200).send( JSON.stringify(result) )
+  const result = await mongoFireDepartment.find().exec()
+  res.status(200).send(JSON.stringify(result))
 })
 
 // begin create fireDepartment
 
 router.post('/', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    const newFireDepartment = new mongoFireDepartment({
-        numberOfFireDepartment: data.numberOfFireDepartment,
-        city: data.city,
-        region: data.region,
-        address: data.address
-    })
+  const newFireDepartment = new mongoFireDepartment({
+    numberOfFireDepartment: data.numberOfFireDepartment,
+    city: data.city,
+    region: data.region,
+    address: data.address
+  })
 
-    const result = await newFireDepartment.save()
-    res.status(200).json(result)
+  const result = await newFireDepartment.save()
+  res.status(200).json(result)
 })
 /*
 TEST:
@@ -45,22 +45,22 @@ content-type: application/json
 // begin binding
 
 router.post('/binding', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    const resultUpdateDepartment = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
-        $push: { brigades: data.brigades }
-    }).exec()
+  const resultUpdateDepartment = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
+    $push: { brigades: data.brigades }
+  }).exec()
 
-    const resultUpdateBrigade = await mongoBrigade.updateOne({ _id: data.brigadeId }, {
-        pertainFireDepartment: data.departmentId
-    })
+  const resultUpdateBrigade = await mongoBrigade.updateOne({ _id: data.brigadeId }, {
+    pertainFireDepartment: data.departmentId
+  })
 
-    const results = {
-        resultUpdateBrigade,
-        resultUpdateDepartment
-    }
+  const results = {
+    resultUpdateBrigade,
+    resultUpdateDepartment
+  }
 
-    res.status(200).send(results)
+  res.status(200).send(results)
 })
 /*
 TEST:
@@ -82,8 +82,8 @@ content-type: application/json
 // begin find fire department by id
 
 router.post('/findById', async (req, res) => {
-    const result = await mongoFireDepartment.findById(req.data.departmentId).exec()
-    res.status(200).send(result)
+  const result = await mongoFireDepartment.findById(req.data.departmentId).exec()
+  res.status(200).send(result)
 })
 
 // end find fire department by id

@@ -19,16 +19,35 @@ export default {
 	name: 'Menu',
 	data: () => ({
 		newFireAddress: null,
-		phoneNumber: null
+		phoneNumber: null,
+    userData: null
 	}),
-	mounted () {
+	async mounted () {
 		this.phoneNumber = this.$route.params.phoneNumber
+    await axios.get('http://localhost:3000/users/login/' + this.phoneNumber)
+      .then(response => {
+        this.userData = response.data
+        console.log(this.userData)
+      })
+      .catch(err => {
+        console.log(err)
+      })
 		connection = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
 		connection.onmessage = async msg => {
 			msg = JSON.parse(msg.data)
 			console.log(msg)
-			if (msg.action === 'registeredNewFire')
-				console.log(msg)
+			if (msg.action === 'registeredNewFire' && this.userData.typeOfUser === 'fireman') {
+        const message = {
+          action: 'takeCall',
+          agent: 'fireMan',
+          data: {
+            fireManId: this.userData._id,
+            causing: msg.data.resultRegistrationNewFire.causing,
+            currentFireId: msg.data.resultRegistrationNewFire._id
+          }
+        }
+				connection.send(JSON.stringify(message))
+      }
 		}
 	},
 	methods: {

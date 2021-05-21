@@ -6,29 +6,29 @@ const mongoUser = require('../models/User.js').mongoUser
 const objectLogin = require('../objects/Login.js')
 
 router.get('/', async (req, res) => {
-    const result = await mongoUser.find().exec()
-    res.status(200).send( JSON.stringify(result) )
+  const result = await mongoUser.find().exec()
+  res.status(200).send(JSON.stringify(result))
 })
 
 
 // begin Registration/Authorization User
 router.post('/', async (req, res) => {
-    try {
-        const data = req.body
-        const isUser = await mongoUser.findOne({ 'Login._login': data.Login }).exec()
-        if (isUser) res.status(200).send( JSON.stringify( isUser ) )
-        else {
-            const newUser = new mongoUser({
-                Login: new objectLogin(data.Login)
-            })
-            const result = await newUser.save()
-            res.status(200).send( JSON.stringify( result ) )
-        }
+  try {
+    const data = req.body
+    const isUser = await mongoUser.findOne({ 'Login._login': data.Login }).exec()
+    if (isUser) res.status(200).send(JSON.stringify(isUser))
+    else {
+      const newUser = new mongoUser({
+        Login: new objectLogin(data.Login)
+      })
+      const result = await newUser.save()
+      res.status(200).send(JSON.stringify(result))
     }
-    catch(err) {
-        console.log(err);
-        res.sendStatus(500)
-    }
+  }
+  catch (err) {
+    console.log(err);
+    res.sendStatus(500)
+  }
 })
 /*
 TEST:
@@ -44,16 +44,16 @@ content-type: application/json
 
 // begin find User by id
 router.post('/findById', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    let users = new Array
-    console.log(data)
+  let users = new Array
+  console.log(data)
 
-    for (i=0; i < data.users.length; i++) {
-        users.push(await mongoUser.findById(data.users[i]).exec())
-    }
+  for (i = 0; i < data.users.length; i++) {
+    users.push(await mongoUser.findById(data.users[i]).exec())
+  }
 
-    res.status(200).send(users)
+  res.status(200).send(users)
 })
 /*
 TEST:
@@ -74,13 +74,13 @@ content-type: application/json
 
 // begin find User by login
 router.get('/login/:login', async (req, res) => {
-    try {
-        const result = await mongoUser.findOne({'Login._login': req.params.login}).exec()
-        res.status(200).json(result)
-    }
-    catch(err) {
-        res.sendStatus(500)
-    }
+  try {
+    const result = await mongoUser.findOne({ 'Login._login': req.params.login }).exec()
+    res.status(200).json(result)
+  }
+  catch (err) {
+    res.sendStatus(500)
+  }
 })
 /*
 TEST:

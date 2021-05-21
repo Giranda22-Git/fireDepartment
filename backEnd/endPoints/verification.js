@@ -5,40 +5,40 @@ const axios = require('axios')
 const mongoVerification = require('../models/freshVerification.js').mongoVerification
 
 router.get('/', async (req, res) => {
-    const result = await mongoVerification.find().exec()
-    res.status(200).send( JSON.stringify(result) )
+  const result = await mongoVerification.find().exec()
+  res.status(200).send(JSON.stringify(result))
 })
 
 // begin create verification code
 
 router.post('/', async (req, res) => {
 
-    const tryAgain = await mongoVerification.findOne({ phoneNumber: req.body.phoneNumber }).exec()
+  const tryAgain = await mongoVerification.findOne({ phoneNumber: req.body.phoneNumber }).exec()
 
-    if (tryAgain)
-        await mongoVerification.deleteOne({ phoneNumber: req.body.phoneNumber }).exec()
+  if (tryAgain)
+    await mongoVerification.deleteOne({ phoneNumber: req.body.phoneNumber }).exec()
 
-    const code = generateCode()
+  const code = generateCode()
 
-    const newfreshVerification = new mongoVerification({
-        phoneNumber: req.body.phoneNumber,
-        verificationCode: code
-    })
+  const newfreshVerification = new mongoVerification({
+    phoneNumber: req.body.phoneNumber,
+    verificationCode: code
+  })
 
-    const result = await newfreshVerification.save()
+  const result = await newfreshVerification.save()
 
-    const params = {
-        login: 'Giranda22',
-        psw: 'Kv7zTusHymtE95m',
-        phones: req.body.phoneNumber,
-        mes: `код подтверждения ${code}`
-    }
+  const params = {
+    login: 'Giranda22',
+    psw: 'Kv7zTusHymtE95m',
+    phones: req.body.phoneNumber,
+    mes: `код подтверждения ${code}`
+  }
 
-    const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
+  const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
 
-    await axios.get(encodeURI(URI))
+  //await axios.get(encodeURI(URI))
 
-    res.status(200).json(result)
+  res.status(200).json(result)
 })
 /*
 TEST:
@@ -58,17 +58,17 @@ content-type: application/json
 // begin verify user
 
 router.post('/verify', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    const code = await mongoVerification.findOne({ phoneNumber: data.phoneNumber }).exec()
+  const code = await mongoVerification.findOne({ phoneNumber: data.phoneNumber }).exec()
 
-    if (code.verificationCode === data.verificationCode) {
-        await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
-        await axios.post('http://localhost:3000/users', { Login: data.phoneNumber })
-        res.send({result: true})
-    }
-    else
-        res.send({result: false})
+  if (code.verificationCode === data.verificationCode) {
+    await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
+    await axios.post('http://localhost:3000/users', { Login: data.phoneNumber })
+    res.send({ result: true })
+  }
+  else
+    res.send({ result: false })
 })
 /*
 TEST:
@@ -85,7 +85,7 @@ content-type: application/json
 // end verify user
 
 function generateCode() {
-    return String(Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000)
+  return String(Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000)
 }
 
 module.exports = router

@@ -5,27 +5,27 @@ const mongoBrigade = require('../models/fireBrigade.js').mongoBrigade
 const mongoFireDepartment = require('../models/fireDepartment.js').mongoFireDepartment
 
 router.get('/', async (req, res) => {
-    const result = await mongoBrigade.find().exec()
-    res.status(200).send( JSON.stringify(result) )
+  const result = await mongoBrigade.find().exec()
+  res.status(200).send(JSON.stringify(result))
 })
 
 // begin new Brigade
 
 router.post('/', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    const newBrigade = new mongoBrigade({
-        numberOfFireBrigade: data.numberOfFireBrigade,
-        pertainFireDepartment: data.pertainFireDepartment,
-        team: data.team,
-        city: data.city
-    })
+  const newBrigade = new mongoBrigade({
+    numberOfFireBrigade: data.numberOfFireBrigade,
+    pertainFireDepartment: data.pertainFireDepartment,
+    team: data.team,
+    city: data.city
+  })
 
-    const result = await newBrigade.save()
-    const updateFireDepartment = await mongoFireDepartment.updateOne({ _id: data.pertainFireDepartment }, {
-        $push: {brigades: result._id}
-    })
-    res.status(200).json(result)
+  const result = await newBrigade.save()
+  const updateFireDepartment = await mongoFireDepartment.updateOne({ _id: data.pertainFireDepartment }, {
+    $push: { brigades: result._id }
+  })
+  res.status(200).json(result)
 })
 /*
 TEST:
@@ -50,16 +50,16 @@ content-type: application/json
 // begin find brigade by id
 
 router.post('/findById', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    let brigades = new Array
-    console.log(data)
+  let brigades = new Array
+  console.log(data)
 
-    for (i=0; i < data.brigades.length; i++) {
-        brigades.push(await mongoBrigade.findById(data.brigades[i]).exec())
-    }
+  for (i = 0; i < data.brigades.length; i++) {
+    brigades.push(await mongoBrigade.findById(data.brigades[i]).exec())
+  }
 
-    res.status(200).send(brigades)
+  res.status(200).send(brigades)
 })
 
 /*
@@ -82,15 +82,15 @@ content-type: application/json
 // begin update status
 
 router.post('/switch', async (req, res) => {
-    const data = req.body
+  const data = req.body
 
-    if (data.switch) {
-        await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'available' })
-        res.status(200).send({ status: 'available' })
-    } else {
-        await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'unavailable' })
-        res.status(200).send({ status: 'unavailable' })
-    }
+  if (data.switch) {
+    await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'available' })
+    res.status(200).send({ status: 'available' })
+  } else {
+    await mongoBrigade.updateOne({ _id: data.brigadeId }, { status: 'unavailable' })
+    res.status(200).send({ status: 'unavailable' })
+  }
 })
 
 // end update status

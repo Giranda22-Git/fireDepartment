@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 
   const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
 
-  //await axios.get(encodeURI(URI))
+  await axios.get(encodeURI(URI))
 
   res.status(200).json(result)
 })
@@ -47,7 +47,7 @@ POST http://localhost:3000/verification/ HTTP/1.1
 content-type: application/json
 
 {
-    "phoneNumber": "8(705)553-99-66"
+  "phoneNumber": "8(705)553-99-66"
 }
 
 */

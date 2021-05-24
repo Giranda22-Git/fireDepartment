@@ -16,7 +16,6 @@ router.post('/', async (req, res) => {
 
   const newBrigade = new mongoBrigade({
     numberOfFireBrigade: data.numberOfFireBrigade,
-    pertainFireDepartment: data.pertainFireDepartment,
     team: data.team,
     city: data.city
   })

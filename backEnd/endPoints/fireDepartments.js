@@ -47,20 +47,17 @@ content-type: application/json
 router.post('/binding', async (req, res) => {
   const data = req.body
 
-  const resultUpdateDepartment = await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
+  await mongoFireDepartment.updateOne({ _id: data.departmentId }, {
     $push: { brigades: data.brigades }
   }).exec()
 
-  const resultUpdateBrigade = await mongoBrigade.updateOne({ _id: data.brigadeId }, {
-    pertainFireDepartment: data.departmentId
+  data.brigades.forEach(brigade => {
+    await mongoBrigade.updateOne({ _id: brigade }, {
+      pertainFireDepartment: data.departmentId
+    })
   })
 
-  const results = {
-    resultUpdateBrigade,
-    resultUpdateDepartment
-  }
-
-  res.status(200).send(results)
+  res.status(200)
 })
 /*
 TEST:
@@ -70,9 +67,8 @@ content-type: application/json
 
 {
     "departmentId": "60986a78f367175e92fbee02",
-    "brigadeId": "60987cb9bc2a9a6445d241fd",
     "brigades": [
-        "60987cb9bc2a9a6445d241fd"
+      "60987cb9bc2a9a6445d241fd"
     ]
 }
 

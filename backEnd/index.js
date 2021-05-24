@@ -106,12 +106,16 @@ async function init(serverData) {
         // поиск обновленного пожара
         const resultTakeCallCurrentFire = await mongoCurrentFire.findById(msg.data.currentFireId).exec()
 
+        // поиск пожарнгого по id
+        const fireManDataForTakeCall = await mongoUser.findById(msg.data.fireManId).exec()
+
         // отправление сообщения человеку который вызвал пожарную машину
         const MessageForTakeCall = {
           action: 'fireTruckDispatched',
           agent: 'server',
           data: {
             updatedCurrentFireData: resultTakeCallCurrentFire,
+            fireManPhoneNumber: fireManDataForTakeCall.Login._login
           }
         }
 
@@ -131,8 +135,6 @@ async function init(serverData) {
           }
         }
 
-        const fireManDataForTakeCall = await mongoUser.findById(msg.data.fireManId).exec()
-
         for (let clientForTakeCall of clients) {
           if (clientForTakeCall.phoneNumber === fireManDataForTakeCall.Login._login) {
             clientForTakeCall.connection.send(JSON.stringify(messageForFireManForTakeCall))
@@ -143,9 +145,33 @@ async function init(serverData) {
 
       // geo data transferring
       if (msg.action === 'geoDataTransfering') {
+        const messageForGeoDataTransfering = {
+          action: 'newCurrentGeoData',
+          agent: 'server',
+          data: {
+            geoData: msg.data.geoData
+          }
+        }
         for (let clientForGeoDataTransfering of clients) {
           if (clientForGeoDataTransfering.phoneNumber === msg.data.phoneNumber) {
-            clientForGeoDataTransfering.connection.send(JSON.stringify(msg.data.message))
+            clientForGeoDataTransfering.connection.send(JSON.stringify(messageForGeoDataTransfering))
+          }
+        }
+      }
+
+
+      // fire brigade Arrived
+      if (msg.action === 'fireBrigadeArrived') {
+        const messageForFireBrigadeArrived = {
+          action: 'fireBrigadeArrived',
+          agent: 'server',
+          data: {
+            result: true
+          }
+        }
+        for (let clientForFireBrrigadeArrived of clients) {
+          if (clientForFireBrrigadeArrived.phoneNumber === msg.data.fireManPhoneNumber) {
+            clientForFireBrrigadeArrived.connection.send(JSON.stringify(messageForFireBrigadeArrived))
           }
         }
       }

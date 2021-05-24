@@ -4,6 +4,7 @@
 			<span> New Fire </span>
 			<input type="text" class="address" placeholder="address" v-model="newFireAddress">
 			<button class="send" @click="newFireSend">Send</button>
+      <button @click="brigadeArrived">Arrived</button>
 		</div>
 		<fireDepartmentForms class="newForm" />
 		<fireBrigadeForms class="newForm" />
@@ -20,7 +21,10 @@ export default {
 	data: () => ({
 		newFireAddress: null,
 		phoneNumber: null,
-    userData: null
+    userData: null,
+    activeCausingPhoneNumber: null,
+    activeFireManPhoneNumber: null,
+    loopKey: null
 	}),
 	async mounted () {
 		this.phoneNumber = this.$route.params.phoneNumber
@@ -46,7 +50,32 @@ export default {
             currentFireId: msg.data.resultRegistrationNewFire._id
           }
         }
+
 				connection.send(JSON.stringify(message))
+      }
+
+      if (msg.action === 'fireTruckDispatched') {
+        this.activeFireManPhoneNumber = msg.data.fireManPhoneNumber
+      }
+
+      if (msg.action === 'startGeoDataTransfering') {
+        const geoDataTranfering = {
+          action: 'geoDataTransfering',
+          agent: 'fireMan',
+          data: {
+            phoneNumber: msg.data.causingPhoneNumber,
+            geoData: {
+              latitude: Math.floor(Math.random() * 100) + 1,
+              altitude: Math.floor(Math.random() * 100) + 1
+            }
+          }
+        }
+        this.activeCausingPhoneNumber = msg.data.causingPhoneNumber
+        this.loopSendGeoData(geoDataTranfering)
+      }
+
+      if (msg.action === 'fireBrigadeArrived') {
+        clearInterval(this.loopKey)
       }
 		}
 	},
@@ -59,11 +88,29 @@ export default {
         agent: 'user',
         data: {
 					causing: causing.data._id,
-          address: this.newFireAddress
+          address: this.newFireAddress,
+          geoData: {
+            latitude: 54,
+            altitude: 45
+          }
         }
       }
 			connection.send(JSON.stringify(message))
-		}
+		},
+    brigadeArrived () {
+      const message = {
+        action: 'fireBrigadeArrived',
+        agent: 'client',
+        data: {
+          fireManPhoneNumber: this.activeFireManPhoneNumber,
+          loopKey: this.loopKey
+        }
+      }
+      connection.send(JSON.stringify(message))
+    },
+    loopSendGeoData (message) {
+      this.loopKey = setInterval(() => connection.send(JSON.stringify(message)), 500)
+    }
 	},
 	components: {
 		fireDepartmentForms,

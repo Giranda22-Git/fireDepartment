@@ -36,7 +36,7 @@ POST http://localhost:3000/users/ HTTP/1.1
 content-type: application/json
 
 {
-    "Login": "8(705)553-99-65"
+  "Login": "8(705)553-99-65"
 }
 */
 // end Registration User

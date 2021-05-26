@@ -51,7 +51,7 @@ router.post('/binding', async (req, res) => {
     $push: { brigades: data.brigades }
   }).exec()
 
-  data.brigades.forEach(brigade => {
+  data.brigades.forEach(async brigade => {
     await mongoBrigade.updateOne({ _id: brigade }, {
       pertainFireDepartment: data.departmentId
     })

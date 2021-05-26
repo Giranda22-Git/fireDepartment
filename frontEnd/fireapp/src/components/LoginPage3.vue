@@ -23,8 +23,8 @@
           v-model="messageCode"
           label="Код *"
           lazy-rules
-          mask="XXXXX"
-          :rules="[ val => val && val.length==5 || 'Пожалуйста, введите код из СМС']"
+          mask="XXXXXX"
+          :rules="[ val => val && val.length==6 || 'Пожалуйста, введите код из СМС']"
           >
           <template v-slot:prepend>
             <q-avatar icon="mail_outline" font-size="22px" />
@@ -40,8 +40,12 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'Login',
+  props:{
+    phone: String
+  },
   data () {
     return {
       messageCode: '',
@@ -58,13 +62,27 @@ export default {
     })
   },
   methods: {
-    onSignIn () {
+    async onSignIn () {
+      var self = this
       this.loadingState = true
-      setTimeout(() => {
-        this.loadingState = false
-        this.$store.commit('cr_token', 'SomeToken')
-        this.$emit('ahead')
-      }, 4000)
+      await axios.post('http://localhost:3000/verification/verify',
+      {
+        phoneNumber: this.phone,
+        verificationCode:  this.messageCode
+      })
+      .then(response => {
+        console.log(response.data.result);
+        if(response.data.result == true){
+          this.loadingState = false
+          self.$emit('ahead')
+        } else {
+          alert('Неверный пароль')
+          this.loadingState = false
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
     }
   }
 }

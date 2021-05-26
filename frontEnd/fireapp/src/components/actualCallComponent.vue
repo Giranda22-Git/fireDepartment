@@ -29,6 +29,7 @@ export default {
   methods:{
     HideParent(){
       document.querySelector('.mainPage').style.opacity = '0'
+      this.$emit('FoundFireman')
       setTimeout(() => {
         this.$router.push('/')
         this.lastMsg = true
@@ -40,7 +41,6 @@ export default {
           }, 2000);
         }, 2000);
       }, 2000);
-
     }
   }
 }

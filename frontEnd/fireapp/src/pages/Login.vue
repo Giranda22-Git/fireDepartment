@@ -5,7 +5,7 @@
       <transition :name="slideType" mode="out-in">
         <PageOne v-if="stage == 1" @goPrev = "previousPage" @ahead = "PhaseAhead" />
         <PageTwo v-if="stage == 2" @goPrev = "previousPage" @ahead = "PhaseGetNumber" />
-        <PageThree v-if="stage == 3" @goPrev = "previousPage" @ahead = "PhaseRedirectToMainPage" />
+        <PageThree v-if="stage == 3" :phone='phone' @goPrev = "previousPage" @ahead = "PhaseRedirectToMainPage" />
       </transition>
   </q-page>
   </q-page-container>
@@ -21,6 +21,7 @@ export default {
   data () {
     return {
       stage: 1,
+      id: null,
       phone: null,
       slideType: 'slide-left'
     }
@@ -37,14 +38,18 @@ export default {
       this.stage += 1
       this.changeSlideType('slide-left')
     },
-    PhaseGetNumber(phone){
+    PhaseGetNumber(phone, id){
+      console.log(id);
+      this.id = id
       this.phone = phone
       this.stage += 1
       this.changeSlideType('slide-left')
     },
     PhaseRedirectToMainPage(){
-      this.$store.commit('cr_phone', this.phone.replace(/\s/g, ''))
-      this.$router.push('/#/')
+      this.$store.commit('cr_phone', [this.phone, this.id])
+      setTimeout(() => {
+        location = '/'
+      }, 200);
     }
   },
   components:{

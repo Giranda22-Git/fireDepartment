@@ -1,3 +1,4 @@
+import { _ } from 'core-js'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -10,9 +11,63 @@ export default new Vuex.Store({
       updated: false,
       theme: localStorage.getItem('theme') || 'white',
       status: localStorage.getItem('status') || 'ordinary',
-      actualCall: localStorage.getItem('actualCall') || {"adress": "SomeAdress"}
+      actualCall: localStorage.getItem('actualCall') || '',
+      ws: null,
+      FireStatus: localStorage.getItem('FireStatus') || false,
+      TripStatus: localStorage.getItem('TripStatus') || false,
+      FiremanCurrentPosition: localStorage.getItem('FiremanCurrentPosition') || [],
     },
     mutations: {
+      FiremanCurrentPosition(state, arr){
+        state.FiremanCurrentPosition = arr
+        localStorage.setItem('FiremanCurrentPosition', arr)
+      },
+      StartTrip(){
+        state.TripStatus = true
+        localStorage.setItem('TripStatus', true)
+      },
+      fireTruckDispatched(state){
+        state.FireStatus = true
+        localStorage.setItem('FireStatus', true)
+      },
+      TakeCall(state){
+        var info = {
+          action: 'takeCall',
+          agent: 'fireMan',
+          data: {
+            fireManId: state.token,
+            causing: state.actualCall.causing,
+            currentFireId: state.actualCall._id
+          }
+        }
+        state.ws.send(JSON.stringify(info))
+        console.log('WS_MESSAGE_SEND_TAKE_CALL');
+      },
+      CreateCall(state, FireInfo){
+        state.actualCall = FireInfo
+        localStorage.setItem('actualCall', FireInfo)
+        console.log(state.actualCall);
+      },
+      CreateWs(state, ws){
+        state.ws = ws
+      },
+      WebSocketSendNewFire(state, Coords){
+        console.log(Coords);
+        var info = {
+          action: 'newFire',
+          agent: 'user',
+          data: {
+            causing: state.token,
+            address: Coords[0],
+            geoData: {
+              latitude: 54,
+              altitude: 45
+            }
+          }
+        }
+        state.ws.send(JSON.stringify(info))
+        console.log('WS_MESSAGE_SEND_NEW_FIRE');
+      },
       actualCall_ch(state, call){
         state.actualCall = call
         localStorage.setItem('actualCall', call)
@@ -24,9 +79,11 @@ export default new Vuex.Store({
         state.token = token
         localStorage.setItem('token', token)
       },
-      cr_phone(state, phone) {
-        state.phone = phone
-        localStorage.setItem('phone', phone)
+      cr_phone(state, payback) {
+        state.phone = payback[0]
+        state.token = payback[1]
+        localStorage.setItem('token', payback[1])
+        localStorage.setItem('phone', payback[0])
       },
       logout(state){
         state.phone = ''
@@ -49,7 +106,7 @@ export default new Vuex.Store({
       },
     },
     getters: {
-      isLoggedIn: state => !!state.token,
+      isLoggedIn: state => !!state.phone,
       status: state => state.status
     },
     strict: process.env.DEBUGGING

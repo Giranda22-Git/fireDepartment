@@ -5,8 +5,8 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <div class="page-reload" @click="reload">Обновить карту</div>
-    <ActionButton :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @Search="Search"/>
-    <PulseAnimation v-if="Searching == true" />
+    <ActionButton v-if="Status!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search"/>
+    <PulseAnimation v-if="Searching == true && Status!='saver' && !FireStatus" />
   </q-page>
 </template>
 
@@ -121,8 +121,9 @@ export default {
     }
 
     function getReturnGeocoding(){
-      axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${map.getCenter()[0]}&lat=${map.getCenter()[1]}&fields=items.point&key=ruhwrq0201`)
+      axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${map.getCenter()[0]}&lat=${map.getCenter()[1]}&key=ruhwrq0201`)
         .then(function(response) {
+          console.log(response);
           locationInfo.innerHTML = response.data.result.items[0].address_name || response.data.result.items[0].full_name
           // console.log(response)
           self.currentAdress = response.data.result.items[0].address_name || response.data.result.items[0].full_name
@@ -135,6 +136,9 @@ export default {
     // map.getCenter
   },
   methods:{
+    chAdr(adr){
+      this.currentAdress = adr
+    },
     forceUpdate(){
       if (this.Status == 'true') {
         this.$store.commit('st_ch', 'false')
@@ -153,13 +157,15 @@ export default {
       })
     },
     reload(){
-      window.location.reload()
+      //window.location.reload()
+      this.$forceUpdate();
     },
     checkTheme(){
       document.getElementById('map').style.filter = `invert(${this.Theme == 'black' ? '100%' : '0%'})`
     },
     Search(){
       this.Searching = true
+      this.$store.commit('WebSocketSendNewFire', [this.currentAdress, this.currentCoords])
     }
   },
   components:{
@@ -172,6 +178,9 @@ export default {
     },
     Theme(){
       return this.$store.state.theme
+    },
+    FireStatus(){
+      return this.$store.state.FireStatus
     }
   }
 }

@@ -68,6 +68,7 @@ export default {
   LocalAdress(newV, oldV){
     console.log(1);
     var self = this
+    this.$emit('chAdr', this.LocalAdress)
     axios.get(`https://catalog.api.2gis.com/3.0/suggests?q=${newV}&sort_point=${this.Coords[0]},${this.Coords[1]}&key=ruhwrq0201`)
     .then(function(response) {
       self.SuggestedVars = response.data?.result?.items.filter((card,index) => index < 6)

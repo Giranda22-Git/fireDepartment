@@ -66,6 +66,7 @@ async function init(serverData) {
       console.log(msg)
       // registration new fire
       if (msg.action === 'newFire') {
+        console.log(msg);
         const newCurrentFire = new mongoCurrentFire({
           address: msg.data.address,
           causing: msg.data.causing

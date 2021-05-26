@@ -57,7 +57,7 @@ router.post('/binding', async (req, res) => {
     })
   })
 
-  res.status(200)
+  res.sendStatus(200)
 })
 /*
 TEST:
@@ -66,10 +66,10 @@ POST http://localhost:3000/fireDepartment/binding HTTP/1.1
 content-type: application/json
 
 {
-    "departmentId": "60986a78f367175e92fbee02",
-    "brigades": [
-      "60987cb9bc2a9a6445d241fd"
-    ]
+  "departmentId": "60986a78f367175e92fbee02",
+  "brigades": [
+    "60ae18d7a6434e9c29c8817e"
+  ]
 }
 
 */

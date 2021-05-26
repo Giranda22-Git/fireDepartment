@@ -21,9 +21,6 @@ router.post('/', async (req, res) => {
   })
 
   const result = await newBrigade.save()
-  const updateFireDepartment = await mongoFireDepartment.updateOne({ _id: data.pertainFireDepartment }, {
-    $push: { brigades: result._id }
-  })
   res.status(200).json(result)
 })
 /*
@@ -33,12 +30,11 @@ POST http://localhost:3000/fireBrigade/ HTTP/1.1
 content-type: application/json
 
 {
-    "numberOfFireBrigade": "1",
-    "pertainFireDepartment": "60986a78f367175e92fbee02",
-    "team": [
-        "6092627ae5e6038bd44ec95d"
-    ],
-    "city": "Almaty"
+  "numberOfFireBrigade": "1",
+  "team": [
+    "6092627ae5e6038bd44ec95d"
+  ],
+  "city": "Almaty"
 }
 
 */

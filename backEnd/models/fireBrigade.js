@@ -6,7 +6,7 @@ const brigade = new mongoose.Schema({
   },
   pertainFireDepartment: {
     type: mongoose.Schema.Types.ObjectId,
-    default: ''
+    default: null
   },
   team: {
     type: [mongoose.Schema.Types.ObjectId],
@@ -15,7 +15,7 @@ const brigade = new mongoose.Schema({
   status: {
     type: String,
     enum: ['available', 'unavailable'],
-    default: 'unavailable'
+    default: 'available'
   },
   city: {
     type: String,

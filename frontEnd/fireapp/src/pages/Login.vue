@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import PageOne from '../components/LoginPage1'
 import PageTwo from '../components/LoginPage2'
 import PageThree from '../components/LoginPage3'
@@ -38,18 +39,24 @@ export default {
       this.stage += 1
       this.changeSlideType('slide-left')
     },
-    PhaseGetNumber(phone, id){
-      console.log(id);
-      this.id = id
+    PhaseGetNumber(phone){
       this.phone = phone
       this.stage += 1
       this.changeSlideType('slide-left')
     },
-    PhaseRedirectToMainPage(){
-      this.$store.commit('cr_phone', [this.phone, this.id])
-      setTimeout(() => {
-        location = '/'
-      }, 200);
+    async PhaseRedirectToMainPage(){
+      var self = this
+        await axios.get(`http://localhost:3000/users/login/${self.phone}`)
+          .then(function(response) {
+            console.log(response.data,'SUCCESS');
+            self.$store.commit('cr_phone', [self.phone, response.data._id])
+            setTimeout(() => {
+              location = '/'
+            }, 200);
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
     }
   },
   components:{

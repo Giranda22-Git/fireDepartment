@@ -12,10 +12,16 @@ import actualCall from 'components/actualCallComponent.vue'
 import { mapGetters } from 'vuex'
 export default {
   name: 'App',
+  data(){
+    return{
+      phone: null
+    }
+  },
   created(){
     if(this.isLoggedIn){
       var self = this
       const ws = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
+      this.$store.commit('CreateWs',ws)
       ws.onopen = function () {
         console.log('START WEBSOCKET CONNECTION');
       };
@@ -34,28 +40,52 @@ export default {
         }
         else if(data.action === "startGeoDataTransfering" && self.status == 'saver'){
           self.$store.commit('StartTrip')
-          if (navigator.geolocation) {
-            setInterval(() => {
-              var info = {
-                action: 'geoDataTransfering',
-                agent: 'fireMan',
-                data: {
-                  phoneNumber: self.phoneNumber,
-                  geoData: {
-                    latitude: navigator.geolocation.getCurrentPosition().coords.latitude,
-                    altitude: navigator.geolocation.getCurrentPosition().coords.longitude
-                  }
-                }
-              }
-              state.ws.send(JSON.stringify(info))
-              console.log('WS_MESSAGE_SEND_GEO');
-            }, 2000);
-          }
-        } else if(data.action === "newCurrentGeoData" && self.status != 'saver'){
-          self.$store.commit('FiremanCurrentPosition', [10,34])
         }
+        // else if (data.action === "fireTruckDispatched" && self.status != 'saver') {
+        //   self.$store.commit('fireTruckDispatched')
+        // }
+        // else if(data.action === "startGeoDataTransfering" && self.status == 'saver'){
+        //   self.$store.commit('StartTrip')
+        //   function showLocation(position) {
+        //     console.log(2,self.phone);
+        //     var latitude = position.coords.latitude;
+        //     var longitude = position.coords.longitude;
+        //     var info = {
+        //         action: 'geoDataTransfering',
+        //         agent: 'fireMan',
+        //         data: {
+        //           phoneNumber: self.phone,
+        //           geoData: {
+        //             latitude: latitude,
+        //             altitude: longitude
+        //           }
+        //         }
+        //     }
+        //       ws.send(JSON.stringify(info))
+        //       console.log('WS_MESSAGE_SEND_GEO');
+        //   }
+        //   function errorHandler(err) {
+        //     if(err.code == 1) {
+        //        alert("Error: Access is denied!");
+        //     } else if( err.code == 2) {
+        //        alert("Error: Position is unavailable!");
+        //     }
+        //   }
+        //   if(navigator.geolocation) {
+        //     console.log(data.causingPhoneNumber);
+        //     self.phone = data.data.causingPhoneNumber
+        //     console.log(self.phone,'KKKKKKKKKKKKKK');
+        //     setInterval(() => {
+        //       navigator.geolocation.getCurrentPosition(showLocation, errorHandler);
+        //     }, 2000);
+        //   } else {
+        //       alert("Sorry, browser does not support geolocation!");
+        //   }
+        // }
+        // else if(data.action === "newCurrentGeoData" && self.status != 'saver'){
+        //   self.$store.commit('FiremanCurrentPosition', [10,34])
+        // }
       };
-      this.$store.commit('CreateWs',ws)
     }
   },
   data () {

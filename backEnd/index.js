@@ -109,6 +109,10 @@ async function init(serverData) {
 
         // поиск пожарнгого по id
         const fireManDataForTakeCall = await mongoUser.findById(msg.data.fireManId).exec()
+        console.log(fireManDataForTakeCall)
+        setTimeout(() => {
+          console.log(fireManDataForTakeCall)
+        }, 2000);
 
         // отправление сообщения человеку который вызвал пожарную машину
         const MessageForTakeCall = {

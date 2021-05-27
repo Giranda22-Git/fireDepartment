@@ -22,7 +22,7 @@ export default new Vuex.Store({
         state.FiremanCurrentPosition = arr
         localStorage.setItem('FiremanCurrentPosition', arr)
       },
-      StartTrip(){
+      StartTrip(state){
         state.TripStatus = true
         localStorage.setItem('TripStatus', true)
       },
@@ -53,6 +53,7 @@ export default new Vuex.Store({
       },
       WebSocketSendNewFire(state, Coords){
         console.log(Coords);
+        console.log(state.token,'AAAAAAAAAAAAAAA');
         var info = {
           action: 'newFire',
           agent: 'user',

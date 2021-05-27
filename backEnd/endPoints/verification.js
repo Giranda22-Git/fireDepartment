@@ -78,7 +78,7 @@ content-type: application/json
 
 {
     "phoneNumber": "8(705)553-99-66",
-    "verificationCode": "513995"
+    "verificationCode": "103234"
 }
 
 */

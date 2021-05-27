@@ -84,7 +84,7 @@ router.get('/login/:login', async (req, res) => {
 })
 /*
 TEST:
-GET http://localhost:3000/users/login/8(705)553-99-65 HTTP/1.1
+GET http://localhost:3000/users/login/+7(705)553-99-65 HTTP/1.1
 content-type: application/json
 */
 // end find User by login

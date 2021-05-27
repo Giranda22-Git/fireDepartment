@@ -68,7 +68,7 @@ export default {
       .then(response => {
         console.log(response)
         this.loadingState = false
-        this.$emit('ahead', this.tel, response.data._id)
+        this.$emit('ahead', this.tel)
       })
       .catch(err => {
         console.log(err)

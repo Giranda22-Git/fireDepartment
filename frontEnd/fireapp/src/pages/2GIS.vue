@@ -1,5 +1,4 @@
 <template>
-
   <q-page id = "MPage" class='flex flex-center'>
     <div id='location'>Your position:</div>
     <div id = 'Ob' style='width:100vw; height: 95vh'>
@@ -22,12 +21,13 @@ export default {
     return{
       Searching: false,
       currentAdress: 'Ваш Адрес не определен',
-      currentCoords: null
+      currentCoords: null,
+      map: null
     }
   },
   watch:{
-    Theme: function(oldV, NewV){
-      document.getElementById('map').style.filter = `invert(${oldV == 'black' ? '100%' : '0%'})`
+    Theme: function(NewV){
+      document.getElementById('map').style.filter = `invert(${NewV == 'black' ? '100%' : '0%'})`
     }
   },
   mounted () {
@@ -36,6 +36,7 @@ export default {
     this.checkTheme()
     var marker
     var map
+    var center
     var self = this
     var locationInfo = document.getElementById('location')
     if (navigator.geolocation) {
@@ -43,7 +44,14 @@ export default {
     }
     
     function success(pos) {
-      const center = [pos.coords.longitude, pos.coords.latitude];
+      if (navigator.geolocation) {
+        if(self.StatusPeople == 'saver') {
+          center = [76.93741563189342, 43.24249282996095];
+        }
+        else {
+          center = [pos.coords.longitude, pos.coords.latitude];
+        }
+      }
 
       map = new mapgl.Map('map', {
         key: '519f87ba-c90a-4500-9c57-71034960435b',
@@ -75,49 +83,109 @@ export default {
         document.querySelector('ellipse').style.rx = '8'
         getReturnGeocoding()
       })
-////////////////////////////
-        const directions = new mapgl.Directions(map, {
-            directionsApiKey: 'ruhwrq0201',
-        });
-        const markers = [];
+      // var Interval = setInterval(() => {
+      //   if (self.TripStatus == true || self.FireStatus == true) {
+      //     clearInterval(Interval)
+      //       const directions = new mapgl.Directions(this.map, {
+      //         directionsApiKey: 'ruhwrq0201',
+      //       });
+      //     if(self.TripStatus == true){
+      //         markers.push(
+      //             new mapgl.Marker(map, {
+      //                 coordinates: [76.93741563189342, 43.24249282996095],
+      //                 icon: 'https://docs.2gis.com/img/dotMarker.svg',
+      //             })
+      //         );
+      //         markers.push(
+      //             new mapgl.Marker(map, {
+      //                 coordinates:  [76.92285818015283, 43.23393034436996],
+      //                 icon: 'https://docs.2gis.com/img/dotMarker.svg',
+      //             })
+      //         );
+      //         markers.forEach((m) => {
+      //             m.destroy();
+      //         });
 
-        let firstPoint;
-        let secondPoint;
-        // A current selecting point
-        let selecting = 'a';
+      //         directions.carRoute({
+      //             points: [[76.93741563189342, 43.24249282996095], [76.92285818015283, 43.23393034436996]]
+      //         });
+      //         axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=YOUR_KEY', 
+      //         {
+      //           points: [
+      //             {
+      //               x: 76.93741563189342,
+      //               y: 43.24249282996095
+      //             },
+      //             {
+      //               x: 76.92285818015283,
+      //               y: 43.23393034436996
+      //             }
+      //           ]
+      //         })
+      //         .then(response => {
+      //           console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+      //           var array = response.data.result.maneuvers
+      //           var i = 0
 
-        map.on('click', (e) => {
-          const coords = e.lngLat;
+      //           setInterval(() => {
+      //             map.setCenter(array[i])
+      //           }, 100);
+      //           i++
+      //         })
+      //         .catch(err => {
+      //           console.log(err)
+      //         })
+      //     }
+      //     else if (self.FireStatus == true) {
+      //       const markers = []
+      //       markers.push(
+      //           new mapgl.Marker(map, {
+      //               coordinates: [76.93741563189342, 43.24249282996095],
+      //               icon: 'https://docs.2gis.com/img/dotMarker.svg',
+      //           })
+      //       );
+      //       markers.push(
+      //           new mapgl.Marker(map, {
+      //               coordinates:  map.getCenter(),
+      //               icon: 'https://docs.2gis.com/img/dotMarker.svg',
+      //           })
+      //       );
+      //       markers.forEach((m) => {
+      //           m.destroy();
+      //       });
 
-          if (selecting != 'end') {
-              // Just to visualize selected points, before the route is done
-              markers.push(
-                  new mapgl.Marker(map, {
-                      coordinates: coords,
-                      icon: 'https://docs.2gis.com/img/dotMarker.svg',
-                  }),
-              );
-          }
+      //       directions.carRoute({
+      //           points: [[76.93741563189342, 43.24249282996095], map.getCenter()]
+      //       });
+      //       axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=YOUR_KEY', 
+      //         {
+      //           points: [
+      //             {
+      //               x: 76.93741563189342,
+      //               y: 43.24249282996095
+      //             },
+      //             {
+      //               x: 76.92285818015283,
+      //               y: 43.23393034436996
+      //             }
+      //           ]
+      //         })
+      //         .then(response => {
+      //           console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+      //           var array = response.data.result.maneuvers
+      //           var i = 0
 
-          if (selecting === 'a') {
-              firstPoint = coords;
-              selecting = 'b';
-          } else if (selecting === 'b') {
-              secondPoint = coords;
-              selecting = 'end';
-          }
-
-          // If all points are selected — we can draw the route
-          if (firstPoint && secondPoint) {
-              directions.carRoute({
-                  points: [firstPoint, secondPoint],
-              });
-               marker.hide()
-              markers.forEach((m) => {
-                  m.destroy();
-              });
-          }
-        });
+      //           setInterval(() => {
+      //             marker.setCoordinates(array[i])
+      //           }, 100);
+      //           i++
+      //         })
+      //         .catch(err => {
+      //           console.log(err)
+      //         })
+      //     }
+      //   }
+      // }, 2000);
     }
 
     function getReturnGeocoding(){
@@ -181,6 +249,12 @@ export default {
     },
     FireStatus(){
       return this.$store.state.FireStatus
+    },
+    TripStatus(){
+      return this.$store.state.TripStatus
+    },
+    StatusPeople(){
+      return this.$store.state.status
     }
   }
 }

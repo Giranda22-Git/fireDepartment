@@ -20,6 +20,10 @@ const fire = new mongoose.Schema({
     causing: { // человек вызвавший пожарных на место пожара
         type: mongoose.Schema.Types.ObjectId,
         required: true
+    },
+    geoData: { // геопозиция пожара, или же геопозиция пользователя на момент регистрации пожара
+      type: Object,
+      default: {}
     }
 })
 

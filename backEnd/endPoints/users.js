@@ -42,6 +42,26 @@ content-type: application/json
 // end Registration User
 
 
+// begin update typeOfUser
+router.put('/typeOfUser', async (req, res) => {
+  const data = req.body
+  const newTypeOfUser = data.typeOfUser ? 'fireman' : 'user'
+  const result = await mongoUser.updateOne({ _id: data.id }, { typeOfUser: newTypeOfUser })
+  res.status(200).json(result)
+})
+/*
+TEST:
+PUT http://localhost:3000/users/typeOfUser HTTP/1.1
+content-type: application/json
+
+{
+  "id": "60a7761c329dcaea9cbce693",
+  "typeOfUser": false
+}
+*/
+// end update typeOfUser
+
+
 // begin find User by id
 router.post('/findById', async (req, res) => {
   const data = req.body

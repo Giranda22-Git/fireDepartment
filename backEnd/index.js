@@ -69,7 +69,8 @@ async function init(serverData) {
         console.log(msg);
         const newCurrentFire = new mongoCurrentFire({
           address: msg.data.address,
-          causing: msg.data.causing
+          causing: msg.data.causing,
+          geoData: msg.data.geoData
         })
 
         const resultRegistrationNewFire = await newCurrentFire.save()
@@ -136,7 +137,8 @@ async function init(serverData) {
           action: 'startGeoDataTransfering',
           agent: 'server',
           data: {
-            causingPhoneNumber: causingCurrentFireForTakeCall.Login._login
+            causingPhoneNumber: causingCurrentFireForTakeCall.Login._login,
+            causingGeoData: resultTakeCallCurrentFire.geoData
           }
         }
 

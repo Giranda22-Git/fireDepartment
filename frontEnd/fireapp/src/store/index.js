@@ -18,6 +18,16 @@ export default new Vuex.Store({
       FiremanCurrentPosition: localStorage.getItem('FiremanCurrentPosition') || [],
     },
     mutations: {
+      FiremanArrived(state){
+        state.actualCall = ''
+        localStorage.removeItem('actualCall')
+        state.FireStatus = false
+        localStorage.removeItem('FireStatus')
+        state.TripStatus = false
+        localStorage.removeItem('TripStatus')
+        state.FiremanCurrentPosition = []
+        localStorage.removeItem('FiremanCurrentPosition')
+      },
       FiremanCurrentPosition(state, arr){
         state.FiremanCurrentPosition = arr
         localStorage.setItem('FiremanCurrentPosition', arr)

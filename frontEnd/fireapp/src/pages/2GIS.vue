@@ -4,8 +4,9 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <div class="page-reload" @click="reload">Обновить карту</div>
-    <ActionButton v-if="Status!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search"/>
-    <PulseAnimation v-if="Searching == true && Status!='saver' && !FireStatus" />
+    <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search"/>
+    <PulseAnimation v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
+    <ArrivedPage v-if="Arrived.length > 0" :text='Arrived'/>
   </q-page>
 </template>
 
@@ -13,6 +14,7 @@
 // <svg class = 'svg' width='35' height='90' viewBox='0 0 29 47' fill='none' xmlns='http://www.w3.org/2000/svg'><ellipse cx='15' cy='43' rx='8' ry='2' fill='black' fill-opacity='0.1'/><line x1='15' y1='28' x2='15' y2='42' stroke='#FF2600' stroke-width='2' stroke-linecap='round'/><circle cx='14.5' cy='14.5' r='14.5' fill='#FF583B'/><circle cx='14.5' cy='14.5' r='6.5' fill='#FFCC81'/><defs><filter id='filter0_f' x='5' y='39' width='20' height='8' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'><feFlood flood-opacity='0' result='BackgroundImageFix'/><feBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape'/><feGaussianBlur stdDeviation='1' result='effect1_foregroundBlur'/></filter></defs></svg>
 import ActionButton from '../components/ActionButton.vue'
 import PulseAnimation from '../components/PulseAnimation.vue'
+import ArrivedPage from '../components/Arrived.vue'
 import axios from 'axios'
 // import mapgl from '@2gis/mapgl'
 export default {
@@ -22,7 +24,8 @@ export default {
       Searching: false,
       currentAdress: 'Ваш Адрес не определен',
       currentCoords: null,
-      map: null
+      map: null,
+      Arrived: ''
     }
   },
   watch:{
@@ -69,7 +72,9 @@ export default {
       self.currentCoords = map.getCenter()
       getReturnGeocoding()
       map.on('move', function (e) {
-        marker.setCoordinates(map.getCenter())
+        if (self.TripStatus != true && self.FireStatus != true) {
+          marker.setCoordinates(map.getCenter())
+        }
         // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
       })
       map.on('movestart', function(){
@@ -83,109 +88,211 @@ export default {
         document.querySelector('ellipse').style.rx = '8'
         getReturnGeocoding()
       })
-      // var Interval = setInterval(() => {
-      //   if (self.TripStatus == true || self.FireStatus == true) {
-      //     clearInterval(Interval)
-      //       const directions = new mapgl.Directions(this.map, {
-      //         directionsApiKey: 'ruhwrq0201',
-      //       });
-      //     if(self.TripStatus == true){
-      //         markers.push(
-      //             new mapgl.Marker(map, {
-      //                 coordinates: [76.93741563189342, 43.24249282996095],
-      //                 icon: 'https://docs.2gis.com/img/dotMarker.svg',
-      //             })
-      //         );
-      //         markers.push(
-      //             new mapgl.Marker(map, {
-      //                 coordinates:  [76.92285818015283, 43.23393034436996],
-      //                 icon: 'https://docs.2gis.com/img/dotMarker.svg',
-      //             })
-      //         );
-      //         markers.forEach((m) => {
-      //             m.destroy();
-      //         });
+      var Interval = setInterval(() => {
+        if (self.TripStatus == true || self.FireStatus == true) {
+          clearInterval(Interval)
+          const directions = new mapgl.Directions(map, {
+            directionsApiKey: 'ruhwrq0201',
+          });
+          const markers = []
+          if(self.TripStatus == true){
+              markers.push(
+                  new mapgl.Marker(map, {
+                      coordinates: [76.93741563189342, 43.24249282996095],
+                      icon: 'https://docs.2gis.com/img/dotMarker.svg',
+                  })
+              );
+              markers.push(
+                  new mapgl.Marker(map, {
+                      coordinates:  [76.92285818015283, 43.23393034436996],
+                      icon: 'https://docs.2gis.com/img/dotMarker.svg',
+                  })
+              );
+              markers.forEach((m) => {
+                  m.destroy();
+              });
 
-      //         directions.carRoute({
-      //             points: [[76.93741563189342, 43.24249282996095], [76.92285818015283, 43.23393034436996]]
-      //         });
-      //         axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=YOUR_KEY', 
-      //         {
-      //           points: [
-      //             {
-      //               x: 76.93741563189342,
-      //               y: 43.24249282996095
-      //             },
-      //             {
-      //               x: 76.92285818015283,
-      //               y: 43.23393034436996
-      //             }
-      //           ]
-      //         })
-      //         .then(response => {
-      //           console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
-      //           var array = response.data.result.maneuvers
-      //           var i = 0
+              axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=ruhwrq0201', 
+              {
+                points: [
+                  {
+                    type: "pedo",
+                    x: 76.93741563189342,
+                    y: 43.24249282996095
+                  },
+                  {
+                    type: "pedo",
+                    x: 76.92285818015283,
+                    y: 43.23393034436996
+                  }
+                ]
+              })
+              .then(response => {
+                console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+                var array = response.data.result.maneuvers
+                var i = 0
 
-      //           setInterval(() => {
-      //             map.setCenter(array[i])
-      //           }, 100);
-      //           i++
-      //         })
-      //         .catch(err => {
-      //           console.log(err)
-      //         })
-      //     }
-      //     else if (self.FireStatus == true) {
-      //       const markers = []
-      //       markers.push(
-      //           new mapgl.Marker(map, {
-      //               coordinates: [76.93741563189342, 43.24249282996095],
-      //               icon: 'https://docs.2gis.com/img/dotMarker.svg',
-      //           })
-      //       );
-      //       markers.push(
-      //           new mapgl.Marker(map, {
-      //               coordinates:  map.getCenter(),
-      //               icon: 'https://docs.2gis.com/img/dotMarker.svg',
-      //           })
-      //       );
-      //       markers.forEach((m) => {
-      //           m.destroy();
-      //       });
+                console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+                var array = response.data.result[0].maneuvers
+                var maneuvers = []
+                var count = 0
+                var pointss = []
 
-      //       directions.carRoute({
-      //           points: [[76.93741563189342, 43.24249282996095], map.getCenter()]
-      //       });
-      //       axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=YOUR_KEY', 
-      //         {
-      //           points: [
-      //             {
-      //               x: 76.93741563189342,
-      //               y: 43.24249282996095
-      //             },
-      //             {
-      //               x: 76.92285818015283,
-      //               y: 43.23393034436996
-      //             }
-      //           ]
-      //         })
-      //         .then(response => {
-      //           console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
-      //           var array = response.data.result.maneuvers
-      //           var i = 0
+                for(let o = 0; o < array.length; o++){
+                  console.log(o);
+                  array[o]?.outcoming_path?.geometry.forEach(element => {
+                    maneuvers = maneuvers.concat(element.selection.split('LINESTRING(').pop().split(')').shift().split(' '));
+                  })
+                  // marker.setCoordinates(array[i].outcoming_path.geometry)
+                }
+                var maneuvers = maneuvers.map(function(el) {
+                  return el.split(',').shift()
+                });
+                console.log(maneuvers,'KKKKKKKK');
+                for(let j = 0; j < maneuvers.length; j+=2){
+                  pointss.push([maneuvers[j], maneuvers[j + 1]])
+                }
+                console.log(pointss,'LLLLLLLLLLL');
+                var time = setInterval(() => {
+                  marker.setCoordinates([maneuvers[count], maneuvers[count + 1]])
+                  count+=2
+                  if(count == maneuvers.length - 2){
+                    clearInterval(time)
+                    directions.clear();
+                    self.Arrived = 'Saver'
+                    self.$store.commit('FiremanArrived')
+                  }
+                }, 1000);
+                var c = Math.round(pointss.length / 15)
+                directions.carRoute({
+                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], [76.92285818015283, 43.23393034436996]],
+                    style: {
+                      routeLineWidth: [
+                          'interpolate',
+                          ['linear'],
+                          ['zoom'],
+                          10,
+                          10, // width will change from 30 px at zoom level 10 and below...
+                          14,
+                          10, // ...to 3 px at zoom level 14 and above
+                      ],
+                      substrateLineWidth: [
+                          'interpolate',
+                          ['linear'],
+                          ['zoom'],
+                          10,
+                          0, // width will change from 3 px at zoom level 10 and below...
+                          14,
+                          0, // ...to 50 px at zoom level 14 and above
+                      ],
+                      haloLineWidth: 0
+                  },
+                });
+              })
+              .catch(err => {
+                console.log(err)
+              })
+          }
+          else if (self.FireStatus == true) {
+            markers.push(
+                new mapgl.Marker(map, {
+                    coordinates: [76.93741563189342, 43.24249282996095],
+                    icon: 'https://docs.2gis.com/img/dotMarker.svg',
+                })
+            );
+            markers.push(
+                new mapgl.Marker(map, {
+                    coordinates:  map.getCenter(),
+                    icon: 'https://docs.2gis.com/img/dotMarker.svg',
+                })
+            );
+            markers.forEach((m) => {
+                m.destroy();
+            });
 
-      //           setInterval(() => {
-      //             marker.setCoordinates(array[i])
-      //           }, 100);
-      //           i++
-      //         })
-      //         .catch(err => {
-      //           console.log(err)
-      //         })
-      //     }
-      //   }
-      // }, 2000);
+           axios.post('https://catalog.api.2gis.com/carrouting/6.0.0/global?key=ruhwrq0201', 
+              {
+                points: [
+                  {
+                    type: "pedo",
+                    x: 76.93741563189342,
+                    y: 43.24249282996095
+                  },
+                  {
+                    type: "pedo",
+                    x: 76.92285818015283,
+                    y: 43.23393034436996
+                  }
+                ]
+              })
+              .then(response => {
+                console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+                var array = response.data.result.maneuvers
+                var i = 0
+
+                console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
+                var array = response.data.result[0].maneuvers
+                var maneuvers = []
+                var count = 0
+                var pointss = []
+
+                for(let o = 0; o < array.length; o++){
+                  console.log(o);
+                  array[o]?.outcoming_path?.geometry.forEach(element => {
+                    maneuvers = maneuvers.concat(element.selection.split('LINESTRING(').pop().split(')').shift().split(' '));
+                  })
+                  // marker.setCoordinates(array[i].outcoming_path.geometry)
+                }
+                var maneuvers = maneuvers.map(function(el) {
+                  return el.split(',').shift()
+                });
+                console.log(maneuvers,'KKKKKKKK');
+                for(let j = 0; j < maneuvers.length; j+=2){
+                  pointss.push([maneuvers[j], maneuvers[j + 1]])
+                }
+                console.log(pointss,'LLLLLLLLLLL');
+                var time = setInterval(() => {
+                  marker.setCoordinates([maneuvers[count], maneuvers[count + 1]])
+                  count+=2
+                  if(count == maneuvers.length - 2){
+                    clearInterval(time)
+                    directions.clear();
+                    self.Arrived = 'Ord'
+                    self.$store.commit('FiremanArrived')
+                  }
+                }, 1000);
+                var c = Math.round(pointss.length / 15)
+                directions.carRoute({
+                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], [76.92285818015283, 43.23393034436996]],
+                    style: {
+                      routeLineWidth: [
+                          'interpolate',
+                          ['linear'],
+                          ['zoom'],
+                          10,
+                          10, // width will change from 30 px at zoom level 10 and below...
+                          14,
+                          10, // ...to 3 px at zoom level 14 and above
+                      ],
+                      substrateLineWidth: [
+                          'interpolate',
+                          ['linear'],
+                          ['zoom'],
+                          10,
+                          0, // width will change from 3 px at zoom level 10 and below...
+                          14,
+                          0, // ...to 50 px at zoom level 14 and above
+                      ],
+                      haloLineWidth: 0
+                  },
+                });
+              })
+              .catch(err => {
+                console.log(err)
+              })
+          }
+        }
+      }, 2000);
     }
 
     function getReturnGeocoding(){
@@ -238,7 +345,8 @@ export default {
   },
   components:{
     ActionButton,
-    PulseAnimation
+    PulseAnimation,
+    ArrivedPage
   },
   computed: {
     Status () {

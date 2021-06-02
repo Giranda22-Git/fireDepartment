@@ -12,8 +12,8 @@
           style="margin-top: 5vh"
           align="justify"
         >
-          <q-tab name="MyRegion" label="Мой район" />
-          <q-tab name="AllRegions" label="Все районы" />
+          <q-tab name="MyRegion" label="Все районы" />
+          <!-- <q-tab name="AllRegions" label="Все районы" /> -->
         </q-tabs>
 
         <input type="text" v-model="inputText" placeholder="Поиск" />
@@ -23,9 +23,9 @@
             <AdressCard v-for="element in VerifiedCards" :key="element.id" :info = "element" />
           </q-tab-panel>
 
-          <q-tab-panel name="AllRegions">
+          <!-- <q-tab-panel name="AllRegions">
             <AdressCard v-for="element in cards" :key="element.id" :info = "element" />
-          </q-tab-panel>
+          </q-tab-panel> -->
 
         </q-tab-panels>
       </q-card>
@@ -36,7 +36,7 @@
 
 <script>
 import AdressCard from '../components/AdressCard'
-
+import axios from 'axios'
 export default {
   name: 'Login',
   data () {
@@ -55,11 +55,22 @@ export default {
       }]
     }
   },
+  // created(){
+  //   var self = this
+  //   axios.get()
+  //   .then(function (response) {
+  //     console.log(response);
+  //     self.cards = response.data.fires
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   })
+  // },
   methods: {
   },
   computed: {
     VerifiedCards(){
-      return this.cards.filter(card => this.inputText.length == 0 || card.adress.includes(this.inputText))
+      return this.cards.filter(card => this.inputText.length == 0 || card.adress.toUpperCase().includes(this.inputText.toUpperCase()))
     }
   },
   components:{

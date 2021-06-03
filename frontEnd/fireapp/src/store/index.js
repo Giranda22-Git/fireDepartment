@@ -12,12 +12,17 @@ export default new Vuex.Store({
       theme: localStorage.getItem('theme') || 'white',
       status: localStorage.getItem('status') || 'ordinary',
       actualCall: localStorage.getItem('actualCall') || '',
+      VictimCoords: localStorage.getItem('VictimCoords') || [],
       ws: null,
       FireStatus: localStorage.getItem('FireStatus') || false,
       TripStatus: localStorage.getItem('TripStatus') || false,
       FiremanCurrentPosition: localStorage.getItem('FiremanCurrentPosition') || [],
     },
     mutations: {
+      GetCoords(state, geo){
+        state.VictimCoords = [geo.latitude,geo.altitude]
+        localStorage.setItem('VictimCoords', [geo.latitude,geo.altitude])
+      },
       FiremanArrived(state){
         state.actualCall = ''
         localStorage.removeItem('actualCall')
@@ -71,11 +76,12 @@ export default new Vuex.Store({
             causing: state.token,
             address: Coords[0],
             geoData: {
-              latitude: 54,
-              altitude: 45
+              latitude: Coords[1][0],
+              altitude: Coords[1][1]
             }
           }
         }
+        console.log(info);
         state.ws.send(JSON.stringify(info))
         console.log('WS_MESSAGE_SEND_NEW_FIRE');
       },

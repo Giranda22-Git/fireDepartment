@@ -40,10 +40,8 @@ export default {
         }
         else if(data.action === "startGeoDataTransfering" && self.status == 'saver'){
           self.$store.commit('StartTrip')
+          self.$store.commit('GetCoords', data.data.causingGeoData)
         }
-        // else if (data.action === "fireTruckDispatched" && self.status != 'saver') {
-        //   self.$store.commit('fireTruckDispatched')
-        // }
         // else if(data.action === "startGeoDataTransfering" && self.status == 'saver'){
         //   self.$store.commit('StartTrip')
         //   function showLocation(position) {

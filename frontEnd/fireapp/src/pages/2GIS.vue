@@ -67,7 +67,8 @@ export default {
       map.setCenter(center)
       // map.showTraffic()
       marker = new mapgl.Marker(map, {
-        coordinates: map.getCenter()
+        coordinates: map.getCenter(),
+        icon: 'Cursor.svg'
       });
       self.currentCoords = map.getCenter()
       getReturnGeocoding()
@@ -77,15 +78,7 @@ export default {
         }
         // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
       })
-      map.on('movestart', function(){
-        document.querySelector('svg').style.marginTop = '-20px'
-        document.querySelector('ellipse').style.cy = '60'
-        document.querySelector('ellipse').style.rx = '12'
-      })
       map.on('moveend', function(){
-        document.querySelector('svg').style.marginTop = '0'
-        document.querySelector('ellipse').style.cy = '43'
-        document.querySelector('ellipse').style.rx = '8'
         getReturnGeocoding()
       })
       var Interval = setInterval(() => {
@@ -104,7 +97,7 @@ export default {
               );
               markers.push(
                   new mapgl.Marker(map, {
-                      coordinates:  [76.92285818015283, 43.23393034436996],
+                      coordinates:  self.VictimCoords,
                       icon: 'https://docs.2gis.com/img/dotMarker.svg',
                   })
               );
@@ -122,8 +115,8 @@ export default {
                   },
                   {
                     type: "pedo",
-                    x: 76.92285818015283,
-                    y: 43.23393034436996
+                    x: self.VictimCoords[0],
+                    y: self.VictimCoords[1]
                   }
                 ]
               })
@@ -220,8 +213,8 @@ export default {
                   },
                   {
                     type: "pedo",
-                    x: 76.92285818015283,
-                    y: 43.23393034436996
+                    x: self.VictimCoords[0],
+                    y: self.VictimCoords[1]
                   }
                 ]
               })
@@ -363,6 +356,9 @@ export default {
     },
     StatusPeople(){
       return this.$store.state.status
+    },
+    VictimCoords(){
+      return this.$store.state.VictimCoords
     }
   }
 }

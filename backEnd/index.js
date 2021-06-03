@@ -11,6 +11,7 @@ const axios = require('axios')
 const mongoCurrentFire = require('./models/currentFire.js').mongoFire
 const mongoUser = require('./models/User.js').mongoUser
 const mongoBrigade = require('./models/fireBrigade.js').mongoBrigade
+const mongoHistoryFire = require('./models/historyFire.js').mongoHistoryFire
 
 const serverData = {
   mongoUrl: 'mongodb://localhost:27017/fireDepartment',
@@ -48,6 +49,7 @@ async function init(serverData) {
     app.use('/verification', require('./endPoints/verification.js'))
     app.use('/fireDepartment', require('./endPoints/fireDepartments.js'))
     app.use('/fireBrigade', require('./endPoints/fireBrigades.js'))
+    app.use('/currentFire', require('./endPoints/currentFire.js'))
   })
 
   // begin WebSocket Client connection
@@ -176,32 +178,63 @@ async function init(serverData) {
             result: true
           }
         }
-        for (let clientForFireBrrigadeArrived of clients) {
-          if (clientForFireBrrigadeArrived.phoneNumber === msg.data.fireManPhoneNumber) {
-            clientForFireBrrigadeArrived.connection.send(JSON.stringify(messageForFireBrigadeArrived))
+
+        const fireManForFireBrigadeArrived = await mongoUser.findOne({ 'Login._login': msg.data.fireManPhoneNumber }).exec()
+        const fireBrigadeForFireBrigadeArrived = await mongoBrigade.findOne({ team: fireManForFireBrigadeArrived._id }).exec()
+        await mongoCurrentFire.updateOne(
+          { activeBrigades: fireBrigadeForFireBrigadeArrived._id },
+          { status: 'inProcess' })
+          .exec()
+
+        for (let clientForFireBrigadeArrived of clients) {
+          if (clientForFireBrigadeArrived.phoneNumber === msg.data.fireManPhoneNumber) {
+            clientForFireBrigadeArrived.connection.send(JSON.stringify(messageForFireBrigadeArrived))
           }
         }
       }
 
 
-      // update fire status; FIXME: not verified
-      if (msg.action === 'updateFireStatus') {
-        const resultFireDataForUpdateFireStatus = await mongoCurrentFire.updateOne(
-          { _id: msg.data.currentFireId },
-          { status: msg.data.status }
-        ).exec()
+      // firefighting is over
+      if (msg.action === 'fireFightingIsOver') {
+        const fireManForFireFightingIsOver = await mongoUser.findOne({ 'Login._login': msg.data.fireManPhoneNumber }).exec()
+        const fireBrigadeForFireFightingIsOver = await mongoBrigade.findOne({ team: fireManForFireFightingIsOver._id }).exec()
+        const currentFireForFireFightingIsOver = await mongoCurrentFire.findOne({ activeBrigades: fireBrigadeForFireFightingIsOver._id }).exec()
 
-        const MessageForUpdateFireStatus = {
-          action: 'fireStatusUpdated',
+        await mongoCurrentFire.updateOne(
+          { _id: currentFireForFireFightingIsOver._id },
+          { status: 'ended' }
+        )
+
+        const updatedCurrentFireForFireFightingIsOver = await mongoCurrentFire.findById(currentFireForFireFightingIsOver._id).exec()
+
+        const newHistoryFire = new mongoHistoryFire({
+          fireData: updatedCurrentFireForFireFightingIsOver,
+          report: msg.data.report,
+          victims: msg.data.victims,
+          combustionPercentage: msg.data.combustionPercentage
+        })
+
+        const newBackUpCurrentFire = await newHistoryFire.save()
+        await mongoCurrentFire.deleteOne({ _id: updatedCurrentFireForFireFightingIsOver._id }).exec()
+
+        await mongoBrigade.updateOne(
+          { _id: fireBrigadeForFireFightingIsOver._id },
+          { status: 'available' }
+        )
+
+        const messageForFireFightingIsOver = {
+          action: 'fireFightingIsOver',
           agent: 'server',
           data: {
-            currentFireId: msg.data.currentFireId,
-            newStatus: msg.data.status,
-            result: resultFireDataForUpdateFireStatus
+            extinguishedFire: newBackUpCurrentFire
           }
         }
 
-        sendAll(MessageForUpdateFireStatus)
+        for (let clientForFireFightingIsOver of clients) {
+          if (clientForFireFightingIsOver.phoneNumber === msg.data.fireManPhoneNumber) {
+            clientForFireFightingIsOver.connection.send(JSON.stringify(messageForFireFightingIsOver))
+          }
+        }
       }
     })
 

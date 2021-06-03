@@ -5,6 +5,7 @@
 			<input type="text" class="address" placeholder="address" v-model="newFireAddress">
 			<button class="send" @click="newFireSend">Send</button>
       <button @click="brigadeArrived">Arrived</button>
+      <button @click="sendEnd">End</button>
 		</div>
 		<fireDepartmentForms class="newForm" />
 		<fireBrigadeForms class="newForm" />
@@ -24,7 +25,14 @@ export default {
     userData: null,
     activeCausingPhoneNumber: null,
     activeFireManPhoneNumber: null,
-    loopKey: null
+    loopKey: null,
+    report: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum tempora vel voluptas saepe quaerat earum, a quos. Neque odio, aliquam asperiores explicabo earum rerum at obcaecati nisi eum praesentium tempora!',
+    victims: [
+      {
+        state: 'alive'
+      }
+    ],
+    combustionPercentage: '50%'
 	}),
 	async mounted () {
 		this.phoneNumber = this.$route.params.phoneNumber
@@ -104,6 +112,19 @@ export default {
         data: {
           fireManPhoneNumber: this.activeFireManPhoneNumber,
           loopKey: this.loopKey
+        }
+      }
+      connection.send(JSON.stringify(message))
+    },
+    sendEnd () {
+      const message = {
+        action: 'fireFightingIsOver',
+        agent: 'fireMan',
+        data: {
+          fireManPhoneNumber: this.activeFireManPhoneNumber,
+          report: this.report,
+          victims: this.victims,
+          combustionPercentage: this.combustionPercentage
         }
       }
       connection.send(JSON.stringify(message))

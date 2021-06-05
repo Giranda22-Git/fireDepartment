@@ -367,7 +367,7 @@ export default {
     },
     Search(){
       this.Searching = true
-      this.$store.commit('WebSocketSendNewFire', [this.currentAdress, this.currentCoords])
+      this.$store.commit('WebSocketSendNewFire', [this.currentAdress, marker.getCoordinates()])
     }
   },
   components:{

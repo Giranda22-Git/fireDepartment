@@ -1,8 +1,8 @@
 <template>
   <div class = "mainDiv">
     <div class="flex">
-      <div class="flexInfo">{{info.adress}}</div>
-      <div class="flexInfo">{{info.time}}</div>
+      <div class="flexInfo">{{info.address}}</div>
+      <div class="flexInfo">{{new Date(Date.parse(info.date)).toLocaleString('ru',options)}}</div>
     </div>
     <button>Выехать</button>
   </div>
@@ -15,6 +15,16 @@ export default {
     info: {
       type: Object,
       required: true
+    }
+  },
+  data(){
+    return {
+      options: {
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      }
     }
   }
 }

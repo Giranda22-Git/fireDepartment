@@ -32,6 +32,8 @@ export default new Vuex.Store({
         localStorage.removeItem('TripStatus')
         state.FiremanCurrentPosition = []
         localStorage.removeItem('FiremanCurrentPosition')
+        state.VictimCoords = ''
+        localStorage.removeItem('VictimCoords')
       },
       FiremanCurrentPosition(state, arr){
         state.FiremanCurrentPosition = arr

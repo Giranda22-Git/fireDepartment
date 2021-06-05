@@ -55,22 +55,22 @@ export default {
       }]
     }
   },
-  // created(){
-  //   var self = this
-  //   axios.get()
-  //   .then(function (response) {
-  //     console.log(response);
-  //     self.cards = response.data.fires
-  //   })
-  //   .catch(function (error) {
-  //     console.log(error);
-  //   })
-  // },
+  created(){
+    var self = this
+    axios.get('http://localhost:3000/currentFire')
+    .then(function (response) {
+      console.log(response);
+      self.cards = response.data
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  },
   methods: {
   },
   computed: {
     VerifiedCards(){
-      return this.cards.filter(card => this.inputText.length == 0 || card.adress.toUpperCase().includes(this.inputText.toUpperCase()))
+      return this.cards.filter(card => this.inputText.length == 0 || card.address.toUpperCase().includes(this.inputText.toUpperCase()))
     }
   },
   components:{

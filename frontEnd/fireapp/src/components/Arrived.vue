@@ -24,6 +24,9 @@ export default {
     setTimeout(() => {
         document.querySelector('.content').style.display = 'none'
     }, 4000);
+    setTimeout(() => {
+      location.reload()
+    }, 6000);
   }
 }
 </script>

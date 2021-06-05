@@ -37,7 +37,7 @@ export default {
     this.activateButton()
     this.forceUpdate()
     this.checkTheme()
-    var marker
+    var marker, marker2
     var map
     var center
     var self = this
@@ -72,18 +72,19 @@ export default {
       });
       self.currentCoords = map.getCenter()
       getReturnGeocoding()
-      map.on('move', function (e) {
+      function MarkerAction(){
         if (self.TripStatus != true && self.FireStatus != true) {
           marker.setCoordinates(map.getCenter())
         }
-        // locationInfo.innerHTML = marker._latlng.lat + ', ' + marker._latlng.lng
-      })
-      map.on('moveend', function(){
-        getReturnGeocoding()
-      })
+      }
+      map.on('move', MarkerAction)
+      map.on('moveend', getReturnGeocoding)
       var Interval = setInterval(() => {
         if (self.TripStatus == true || self.FireStatus == true) {
           clearInterval(Interval)
+          map.off('move', MarkerAction)
+          map.off('moveend', getReturnGeocoding)
+          marker.destroy()
           const directions = new mapgl.Directions(map, {
             directionsApiKey: 'ruhwrq0201',
           });
@@ -146,19 +147,9 @@ export default {
                   pointss.push([maneuvers[j], maneuvers[j + 1]])
                 }
                 console.log(pointss,'LLLLLLLLLLL');
-                var time = setInterval(() => {
-                  marker.setCoordinates([maneuvers[count], maneuvers[count + 1]])
-                  count+=2
-                  if(count == maneuvers.length - 2){
-                    clearInterval(time)
-                    directions.clear();
-                    self.Arrived = 'Saver'
-                    self.$store.commit('FiremanArrived')
-                  }
-                }, 1000);
-                var c = Math.round(pointss.length / 15)
+                var c = Math.round(pointss.length / 12)
                 directions.carRoute({
-                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], [76.92285818015283, 43.23393034436996]],
+                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], pointss[c*8], self.VictimCoords],
                     style: {
                       routeLineWidth: [
                           'interpolate',
@@ -180,6 +171,32 @@ export default {
                       ],
                       haloLineWidth: 0
                   },
+                });
+                var time = setInterval(() => {
+                  locationInfo.innerHTML = `Оставшееся время: ${pointss.length - count/2}`
+                  marker2.setCoordinates([maneuvers[count], maneuvers[count + 1]])
+                  count+=2
+                  if (count%10 == 0) {
+                    map.setCenter([maneuvers[count], maneuvers[count + 1]])
+                  }
+                  if(count == maneuvers.length - 2){
+                    map.on('move', MarkerAction)
+                    map.on('moveend', getReturnGeocoding)
+                    marker2.destroy()
+                    getReturnGeocoding()
+                    clearInterval(time)
+                    directions.clear();
+                    self.Arrived = 'Saver'
+                    self.$store.commit('FiremanArrived')
+                    marker = new mapgl.Marker(map, {
+                      coordinates: map.getCenter(),
+                      icon: 'Cursor.svg'
+                    });
+                  }
+                }, 1000);
+                marker2 = new mapgl.Marker(map, {
+                  coordinates: map.getCenter(),
+                  icon: 'Cursor.svg'
                 });
               })
               .catch(err => {
@@ -213,8 +230,8 @@ export default {
                   },
                   {
                     type: "pedo",
-                    x: self.VictimCoords[0],
-                    y: self.VictimCoords[1]
+                    x: map.getCenter()[0],
+                    y: map.getCenter()[1]
                   }
                 ]
               })
@@ -244,19 +261,9 @@ export default {
                   pointss.push([maneuvers[j], maneuvers[j + 1]])
                 }
                 console.log(pointss,'LLLLLLLLLLL');
-                var time = setInterval(() => {
-                  marker.setCoordinates([maneuvers[count], maneuvers[count + 1]])
-                  count+=2
-                  if(count == maneuvers.length - 2){
-                    clearInterval(time)
-                    directions.clear();
-                    self.Arrived = 'Ord'
-                    self.$store.commit('FiremanArrived')
-                  }
-                }, 1000);
-                var c = Math.round(pointss.length / 15)
+                var c = Math.round(pointss.length / 12)
                 directions.carRoute({
-                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], [76.92285818015283, 43.23393034436996]],
+                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], pointss[c*8], [76.92285818015283, 43.23393034436996]],
                     style: {
                       routeLineWidth: [
                           'interpolate',
@@ -278,6 +285,33 @@ export default {
                       ],
                       haloLineWidth: 0
                   },
+                });
+                var time = setInterval(() => {
+                  locationInfo.innerHTML = `Оставшееся время: ${pointss.length - count/2}`
+                  marker2.setCoordinates([maneuvers[count], maneuvers[count + 1]])
+                  count+=2
+                  if (count%10 == 0) {
+                    map.setCenter([maneuvers[count], maneuvers[count + 1]])
+                  }
+                  if(count == maneuvers.length - 2){
+                    map.on('move', MarkerAction)
+                    map.off('moveend', getReturnGeocoding)
+                    marker2.destroy()
+                    getReturnGeocoding()
+                    clearInterval(time)
+                    directions.clear();
+                    self.Arrived = 'Ord'
+                    self.Searching = false
+                    self.$store.commit('FiremanArrived')
+                    marker = new mapgl.Marker(map, {
+                      coordinates: map.getCenter(),
+                      icon: 'Cursor.svg'
+                    });
+                  }
+                }, 1000);
+                marker2 = new mapgl.Marker(map, {
+                  coordinates: map.getCenter(),
+                  icon: 'Cursor.svg'
                 });
               })
               .catch(err => {

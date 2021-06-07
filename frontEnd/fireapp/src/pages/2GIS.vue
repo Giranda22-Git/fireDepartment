@@ -24,8 +24,8 @@ export default {
       Searching: false,
       currentAdress: 'Ваш Адрес не определен',
       currentCoords: null,
-      map: null,
-      Arrived: ''
+      Arrived: '',
+      MarkerCoords: null
     }
   },
   watch:{
@@ -70,11 +70,13 @@ export default {
         coordinates: map.getCenter(),
         icon: 'Cursor.svg'
       });
+      self.MarkerCoords = map.getCenter()
       self.currentCoords = map.getCenter()
       getReturnGeocoding()
       function MarkerAction(){
         if (self.TripStatus != true && self.FireStatus != true) {
           marker.setCoordinates(map.getCenter())
+          self.MarkerCoords = map.getCenter()
         }
       }
       map.on('move', MarkerAction)
@@ -196,7 +198,8 @@ export default {
                 }, 1000);
                 marker2 = new mapgl.Marker(map, {
                   coordinates: map.getCenter(),
-                  icon: 'Cursor.svg'
+                  icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
+                  zIndex: 100
                 });
               })
               .catch(err => {
@@ -311,7 +314,8 @@ export default {
                 }, 1000);
                 marker2 = new mapgl.Marker(map, {
                   coordinates: map.getCenter(),
-                  icon: 'Cursor.svg'
+                  icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
+                  zIndex: 100
                 });
               })
               .catch(err => {
@@ -367,7 +371,7 @@ export default {
     },
     Search(){
       this.Searching = true
-      this.$store.commit('WebSocketSendNewFire', [this.currentAdress, marker.getCoordinates()])
+      this.$store.commit('WebSocketSendNewFire', [this.currentAdress, this.MarkerCoords])
     }
   },
   components:{

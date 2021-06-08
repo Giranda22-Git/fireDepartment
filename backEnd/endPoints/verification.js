@@ -34,9 +34,9 @@ router.post('/', async (req, res) => {
     mes: `код подтверждения ${code}`
   }
 
-  //const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
+  const URI = `https://smsc.kz/sys/send.php?login=Giranda22&psw=Kv7zTusHymtE95m&phones=${req.body.phoneNumber}&mes=${params.mes}`
 
-  //await axios.get(encodeURI(URI))
+  await axios.get(encodeURI(URI))
 
   res.status(200).json(result)
 })

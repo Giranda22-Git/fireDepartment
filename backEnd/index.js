@@ -13,11 +13,7 @@ const mongoUser = require('./models/User.js').mongoUser
 const mongoBrigade = require('./models/fireBrigade.js').mongoBrigade
 const mongoHistoryFire = require('./models/historyFire.js').mongoHistoryFire
 
-const serverData = {
-  mongoUrl: 'mongodb://localhost:27017/fireDepartment',
-  serverUrl: 'http://localhost:3000/',
-  PORT: 3000
-}
+const serverData = require('./staticData/mountedData.js')
 
 const app = express()
 
@@ -42,7 +38,7 @@ async function init(serverData) {
   mongoose.connection.once('open', () => {
     app.listen(serverData.PORT, (err) => {
       if (err) return new Error(`error in starting server, error: ${err}`)
-      else console.log(`server started on \nPORT: ${serverData.PORT}\nURL: ${serverData.serverUrl}`)
+      else console.log(`server started on \nPORT: ${serverData.PORT}\nURL: ${serverData.interiorServerUrl}`)
     })
 
     app.use('/users', require('./endPoints/users.js'))
@@ -105,7 +101,7 @@ async function init(serverData) {
           brigadeId: brigade._id,
           switch: false
         }
-        await axios.post('http://localhost:3000/fireBrigade/switch', params)
+        await axios.post(serverData.externalServerUrl + 'fireBrigade/switch', params)
 
         // поиск обновленного пожара
         const resultTakeCallCurrentFire = await mongoCurrentFire.findById(msg.data.currentFireId).exec()

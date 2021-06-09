@@ -3,6 +3,7 @@ const router = express.Router()
 const axios = require('axios')
 
 const mongoVerification = require('../models/freshVerification.js').mongoVerification
+const serverData = require('../staticData/mountedData.js')
 
 router.get('/', async (req, res) => {
   const result = await mongoVerification.find().exec()
@@ -64,7 +65,7 @@ router.post('/verify', async (req, res) => {
 
   if (code.verificationCode === data.verificationCode) {
     await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
-    await axios.post('http://localhost:3000/users', { Login: data.phoneNumber })
+    await axios.post(serverData.externalServerUrl + 'users', { Login: data.phoneNumber })
     res.send({ result: true })
   }
   else

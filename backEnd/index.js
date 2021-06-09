@@ -24,6 +24,7 @@ app.use((req, res, next) => {
   next()
 })
 app.use(cors())
+app.options('*', cors())
 
 let clients = new Set()
 

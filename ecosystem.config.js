@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: 'fireDepartment-api',
-    script: './back/index.js',
+    script: './backEnd/index.js',
     env: {
       NODE_ENV: 'development',
     },

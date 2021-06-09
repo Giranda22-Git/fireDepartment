@@ -28,7 +28,7 @@ export default {
 				region: this.region,
 				address: this.address
 			}
-			await axios.post('http://localhost:3000/fireDepartment/', params)
+			await axios.post('http://143.198.163.37/fireDepartment/', params)
 				.then(response => {
 					this.newDepartmentResponse = response.data
 					console.log(this.newDepartmentResponse)

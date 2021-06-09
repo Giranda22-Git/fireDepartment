@@ -27,7 +27,7 @@ export default {
 			const params = {
 				phoneNumber: this.phoneNumber
 			}
-			await axios.post('http://localhost:3000/verification', params)
+			await axios.post('http://143.198.163.37/verification', params)
 				.then(response => {
           if (response.data !== '') {
             console.log(response.data)
@@ -49,7 +49,7 @@ export default {
 				phoneNumber: this.phoneNumber,
 				verificationCode: verifyCode
 			}
-			await axios.post('http://localhost:3000/verification/verify', params)
+			await axios.post('http://143.198.163.37/verification/verify', params)
 				.then(response => {
           if (!response.data.result) {
             console.log(response.data)

@@ -65,7 +65,7 @@ router.post('/verify', async (req, res) => {
 
   if (code.verificationCode === data.verificationCode) {
     await mongoVerification.deleteOne({ phoneNumber: data.phoneNumber }).exec()
-    await axios.post(serverData.externalServerUrl + 'users', { Login: data.phoneNumber })
+    await axios.post(serverData.externalServerUrl + '/users', { Login: data.phoneNumber })
     res.send({ result: true })
   }
   else

@@ -101,7 +101,7 @@ async function init(serverData) {
           brigadeId: brigade._id,
           switch: false
         }
-        await axios.post(serverData.externalServerUrl + 'fireBrigade/switch', params)
+        await axios.post(serverData.externalServerUrl + '/fireBrigade/switch', params)
 
         // поиск обновленного пожара
         const resultTakeCallCurrentFire = await mongoCurrentFire.findById(msg.data.currentFireId).exec()

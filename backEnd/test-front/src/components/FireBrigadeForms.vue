@@ -28,7 +28,7 @@ export default {
 				pertainFireDepartment: this.departmentId,
 				team: this.team.split(',')
 			}
-			await axios.post('http://localhost:3000/fireBrigade/', params)
+			await axios.post('http://143.198.163.37/fireBrigade/', params)
 				.then(response => {
 					this.newBrigadeResponse = response.data
 					console.log(this.newBrigadeResponse)

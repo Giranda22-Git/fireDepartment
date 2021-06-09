@@ -36,7 +36,7 @@ export default {
 	}),
 	async mounted () {
 		this.phoneNumber = this.$route.params.phoneNumber
-    await axios.get('http://localhost:3000/users/login/' + this.phoneNumber)
+    await axios.get('http://143.198.163.37/users/login/' + this.phoneNumber)
       .then(response => {
         this.userData = response.data
         console.log(this.userData)
@@ -44,7 +44,7 @@ export default {
       .catch(err => {
         console.log(err)
       })
-		connection = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
+		connection = new WebSocket('ws://143.198.163.37:1000/' + this.phoneNumber)
 		connection.onmessage = async msg => {
 			msg = JSON.parse(msg.data)
 			console.log(msg)
@@ -89,7 +89,7 @@ export default {
 	},
 	methods: {
 		async newFireSend () {
-			const causing = await axios.get('http://localhost:3000/users/login/'+this.phoneNumber)
+			const causing = await axios.get('http://143.198.163.37/users/login/'+this.phoneNumber)
 			console.log(causing)
 			const message = {
 				action: 'newFire',

@@ -46,12 +46,12 @@ export default {
     },
     async PhaseRedirectToMainPage(){
       var self = this
-        await axios.get(`http://localhost:3000/users/login/${self.phone}`)
+        await axios.get(`${this.$store.state.backEndUrl}/users/login/${self.phone}`)
           .then(function(response) {
             console.log(response.data,'SUCCESS');
             self.$store.commit('cr_phone', [self.phone, response.data._id])
             setTimeout(() => {
-              location = '/'
+              self.$router.push('/')
             }, 200);
           })
           .catch(function (error) {

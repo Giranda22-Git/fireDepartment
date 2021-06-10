@@ -1,8 +1,9 @@
 <template>
   <q-item
+    :style="`color: ${Theme == 'white' ? 'black' : 'white'}`"
     clickable
     tag="a"
-    :href="link"
+    :to="link"
   >
     <q-item-section
       v-if="icon"
@@ -43,6 +44,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+  computed: {
+    Theme(){
+      return this.$store.state.theme
+    },
   }
 }
 </script>

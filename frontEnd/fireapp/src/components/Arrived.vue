@@ -25,7 +25,7 @@ export default {
         document.querySelector('.content').style.display = 'none'
     }, 4000);
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 6000);
   }
 }

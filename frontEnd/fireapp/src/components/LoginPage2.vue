@@ -23,8 +23,8 @@
           v-model="tel"
           label="Телефон *"
           lazy-rules
-          mask="#(###)###-##-##"
-          :rules="[ val => val && val.length==15 || 'Пожалуйста, введите свой телефон']"
+          mask="+#(###)###-##-##"
+          :rules="[ val => val && val.length==16 || 'Пожалуйста, введите свой телефон']"
           >
           <template v-slot:prepend>
             <q-avatar icon="call" font-size="22px" />
@@ -45,7 +45,7 @@ export default {
   name: 'Login',
   data () {
     return {
-      tel: '',
+      tel: '7',
       loadingState: false
     }
   },
@@ -61,12 +61,12 @@ export default {
   methods: {
     async onSignIn () {
       this.loadingState = true
-      await axios.post('http://localhost:3000/verification',
+      await axios.post(`${this.$store.state.backEndUrl}/verification`,
       {
         phoneNumber: this.tel
       })
       .then(response => {
-        console.log(response)
+        console.log(response.data.verificationCode)
         this.loadingState = false
         this.$emit('ahead', this.tel)
       })

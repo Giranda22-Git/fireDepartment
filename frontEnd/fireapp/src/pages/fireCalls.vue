@@ -57,7 +57,7 @@ export default {
   },
   created(){
     var self = this
-    axios.get('http://localhost:3000/currentFire')
+    axios.get(`${this.$store.state.backEndUrl}/currentFire `)
     .then(function (response) {
       console.log(response);
       self.cards = response.data

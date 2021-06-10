@@ -6,6 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+      backEndUrl: 'http://143.198.163.37',
+      backEndWsUrl: 'ws://143.198.163.37:2000/',
       token: localStorage.getItem('token') || '',
       phone: localStorage.getItem('phone') || '',
       updated: false,
@@ -19,6 +21,10 @@ export default new Vuex.Store({
       FiremanCurrentPosition: localStorage.getItem('FiremanCurrentPosition') || [],
     },
     mutations: {
+      GetStatusSaver(state){
+        state.status = 'saver'
+        localStorage.setItem('status', 'saver')
+      },
       GetCoords(state, geo){
         state.VictimCoords = [geo.latitude,geo.altitude]
         localStorage.setItem('VictimCoords', [geo.latitude,geo.altitude])

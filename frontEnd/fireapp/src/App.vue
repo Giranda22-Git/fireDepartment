@@ -20,7 +20,7 @@ export default {
   created(){
     if(this.isLoggedIn){
       var self = this
-      const ws = new WebSocket('ws://localhost:1000/' + this.phoneNumber)
+      const ws = new WebSocket(`${this.$store.state.backEndWsUrl}` + this.phoneNumber)
       this.$store.commit('CreateWs',ws)
       ws.onopen = function () {
         console.log('START WEBSOCKET CONNECTION');

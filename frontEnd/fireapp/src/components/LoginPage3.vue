@@ -65,7 +65,7 @@ export default {
     async onSignIn () {
       var self = this
       this.loadingState = true
-      await axios.post('http://localhost:3000/verification/verify',
+      await axios.post(`${this.$store.state.backEndUrl}/verification/verify`,
       {
         phoneNumber: this.phone,
         verificationCode:  this.messageCode

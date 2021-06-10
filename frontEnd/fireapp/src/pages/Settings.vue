@@ -55,6 +55,8 @@
 
         </q-tab-panels>
       </q-card>
+      <!-- <button class="button" @click="click">Press Me!</button> -->
+      <button @click="getStatus">Make me saver</button>
   </q-page>
   </q-page-container>
 </q-layout>
@@ -82,13 +84,32 @@ export default {
     }
   },
   methods: {
+    getStatus(){
+      this.$store.commit('GetStatusSaver')
+    },
+    // async click (){
+    //   console.log(1);
+    //   Notification.requestPermission().then(async (result) => {
+    //     if (result === 'granted') {
+    //       alert(1)
+    //       const reg = await navigator.serviceWorker.getRegistration();
+    //       console.log(reg);
+    //       reg.showNotification("Hello My Friend!");
+    //       setInterval(() => {
+    //         reg.showNotification("Hello My Friend!");
+    //       }, 3000);
+    //     } else {
+    //       alert(2)
+    //     }
+    //   });
+    // },
 		async newBrigade () {
 			const params = {
 				numberOfFireBrigade: this.numberOfFireBrigade,
 				city: this.cityB,
 				team: this.team.split(',')
 			}
-			await axios.post('http://localhost:3000/fireBrigade/', params)
+			await axios.post(`${this.$store.state.backEndUrl}/fireBrigade/`, params)
 				.then(response => {
 					this.newBrigadeResponse = response.data
 					console.log(this.newBrigadeResponse)
@@ -104,7 +125,7 @@ export default {
 				region: this.region,
 				address: this.address
 			}
-			await axios.post('http://localhost:3000/fireDepartment/', params)
+			await axios.post(`${this.$store.state.backEndUrl}/fireDepartment/`, params)
 				.then(response => {
 					this.newDepartmentResponse = response.data
 					console.log(this.newDepartmentResponse)
@@ -118,7 +139,7 @@ export default {
 				departmentId: this.departmentIdPlus,
         brigades: this.brigadesPlus.split(',')
 			}
-			await axios.post('http://localhost:3000/fireDepartment/binding', params)
+			await axios.post(`${this.$store.state.backEndUrl}/fireDepartment/binding`, params)
 				.then(response => {
 					this.newDepartmentResponse = response.data
 					console.log(this.newDepartmentResponse)

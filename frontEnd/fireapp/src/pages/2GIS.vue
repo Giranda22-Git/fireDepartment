@@ -3,9 +3,10 @@
     <div id='location'>Your position:</div>
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
-    <div class="page-reload" @click="reload">Обновить карту</div>
+    <!-- <div class="page-reload" @click="reload">Обновить карту</div> -->
     <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search"/>
     <PulseAnimation v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
+    <SearchingButton v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
     <ArrivedPage v-if="Arrived.length > 0" :text='Arrived'/>
   </q-page>
 </template>
@@ -15,6 +16,7 @@
 import ActionButton from '../components/ActionButton.vue'
 import PulseAnimation from '../components/PulseAnimation.vue'
 import ArrivedPage from '../components/Arrived.vue'
+import SearchingButton from '../components/SearchingButton.vue'
 import axios from 'axios'
 // import mapgl from '@2gis/mapgl'
 export default {
@@ -34,19 +36,16 @@ export default {
     }
   },
   mounted () {
-    this.activateButton()
+    // this.activateButton()
     this.forceUpdate()
     this.checkTheme()
     var marker, marker2
     var map
+    var Radian = 190/Math.PI
     var center
     var self = this
     var locationInfo = document.getElementById('location')
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(success)
-    }
-    
-    function success(pos) {
+        function success(pos) {
       if (navigator.geolocation) {
         if(self.StatusPeople == 'saver') {
           center = [76.93741563189342, 43.24249282996095];
@@ -55,7 +54,6 @@ export default {
           center = [pos.coords.longitude, pos.coords.latitude];
         }
       }
-
       map = new mapgl.Map('map', {
         key: '519f87ba-c90a-4500-9c57-71034960435b',
         center: center,
@@ -174,11 +172,17 @@ export default {
                       haloLineWidth: 0
                   },
                 });
+                var Angle = 0;
                 var time = setInterval(() => {
                   locationInfo.innerHTML = `Оставшееся время: ${pointss.length - count/2}`
                   marker2.setCoordinates([maneuvers[count], maneuvers[count + 1]])
+
+                  Angle = [maneuvers[count + 3] - maneuvers[count + 1], maneuvers[count + 2] - maneuvers[count]]
+                  console.log(Math.atan2(Angle[0],Angle[1]) * Radian - 90, Angle);
+                  map.setRotation(Math.atan2(Angle[0],Angle[1]) * Radian - 90)
+
                   count+=2
-                  if (count%10 == 0) {
+                  if (count%4 == 0) {
                     map.setCenter([maneuvers[count], maneuvers[count + 1]])
                   }
                   if(count == maneuvers.length - 2){
@@ -239,10 +243,6 @@ export default {
                 ]
               })
               .then(response => {
-                console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
-                var array = response.data.result.maneuvers
-                var i = 0
-
                 console.log(response, 'RESPONSE_2GIS_DATA_POINTS');
                 var array = response.data.result[0].maneuvers
                 var maneuvers = []
@@ -325,6 +325,14 @@ export default {
         }
       }, 2000);
     }
+    function error(err){
+      alert(`ERROR(${err.code}): ${err.message}`);
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(success,error)
+    } else {
+      alert('NAVIGATOR_ERROR');
+    }
 
     function getReturnGeocoding(){
       axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${map.getCenter()[0]}&lat=${map.getCenter()[1]}&key=ruhwrq0201`)
@@ -353,15 +361,15 @@ export default {
         this.$store.commit('st_ch', 'true')
       }
     },
-    activateButton(){
-      let button = document.querySelector('.page-reload')
-      button.addEventListener('touchstart', function(){
-        button.style.background = "rgb(245,245,245)"
-      })
-      button.addEventListener('touchend', function(){
-        button.style.background = "#e0e0e0"
-      })
-    },
+    // activateButton(){
+    //   let button = document.querySelector('.page-reload')
+    //   button.addEventListener('touchstart', function(){
+    //     button.style.background = "rgb(245,245,245)"
+    //   })
+    //   button.addEventListener('touchend', function(){
+    //     button.style.background = "#e0e0e0"
+    //   })
+    // },
     reload(){
       //window.location.reload()
       this.$forceUpdate();
@@ -377,7 +385,8 @@ export default {
   components:{
     ActionButton,
     PulseAnimation,
-    ArrivedPage
+    ArrivedPage,
+    SearchingButton
   },
   computed: {
     Status () {
@@ -412,7 +421,7 @@ export default {
   align-items: center;
   justify-content: center;
   transition: 0.5s;
-  padding: 0 5px 0 10vw;
+  padding: 0 40px 0 40px;
   box-sizing: border-box;
   text-align: center;
 }

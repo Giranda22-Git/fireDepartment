@@ -17,7 +17,6 @@ export default function (/* { store, ssrContext } */) {
   })
 
 Router.beforeEach((to, from, next) => {
-  console.log(store.getters.status, 1);
   if (to.name !== 'login' && !store.getters.isLoggedIn) next({ name: 'login' })
   else next()
 })

@@ -4,7 +4,7 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <!-- <div class="page-reload" @click="reload">Обновить карту</div> -->
-    <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search"/>
+    <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search" @GetCenter="SetCenter"/>
     <PulseAnimation v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
     <SearchingButton v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
     <ArrivedPage v-if="Arrived.length > 0" :text='Arrived'/>
@@ -27,7 +27,8 @@ export default {
       currentAdress: 'Ваш Адрес не определен',
       currentCoords: null,
       Arrived: '',
-      MarkerCoords: null
+      MarkerCoords: null,
+      map: null
     }
   },
   watch:{
@@ -54,7 +55,7 @@ export default {
           center = [pos.coords.longitude, pos.coords.latitude];
         }
       }
-      map = new mapgl.Map('map', {
+      self.map = new mapgl.Map('map', {
         key: '519f87ba-c90a-4500-9c57-71034960435b',
         center: center,
         zoom: 18,
@@ -62,42 +63,42 @@ export default {
         zoomControl: false,
         fullscreenControl: false
       });
-      map.setCenter(center)
-      // map.showTraffic()
-      marker = new mapgl.Marker(map, {
-        coordinates: map.getCenter(),
+      self.map.setCenter(center)
+      // self.map.showTraffic()
+      marker = new mapgl.Marker(self.map, {
+        coordinates: self.map.getCenter(),
         icon: 'Cursor.svg'
       });
-      self.MarkerCoords = map.getCenter()
-      self.currentCoords = map.getCenter()
+      self.MarkerCoords = self.map.getCenter()
+      self.currentCoords = self.map.getCenter()
       getReturnGeocoding()
       function MarkerAction(){
         if (self.TripStatus != true && self.FireStatus != true) {
-          marker.setCoordinates(map.getCenter())
-          self.MarkerCoords = map.getCenter()
+          marker.setCoordinates(self.map.getCenter())
+          self.MarkerCoords = self.map.getCenter()
         }
       }
-      map.on('move', MarkerAction)
-      map.on('moveend', getReturnGeocoding)
+      self.map.on('move', MarkerAction)
+      self.map.on('moveend', getReturnGeocoding)
       var Interval = setInterval(() => {
         if (self.TripStatus == true || self.FireStatus == true) {
           clearInterval(Interval)
-          map.off('move', MarkerAction)
-          map.off('moveend', getReturnGeocoding)
+          self.map.off('move', MarkerAction)
+          self.map.off('moveend', getReturnGeocoding)
           marker.destroy()
-          const directions = new mapgl.Directions(map, {
+          const directions = new mapgl.Directions(self.map, {
             directionsApiKey: 'ruhwrq0201',
           });
           const markers = []
           if(self.TripStatus == true){
               markers.push(
-                  new mapgl.Marker(map, {
+                  new mapgl.Marker(self.map, {
                       coordinates: [76.93741563189342, 43.24249282996095],
                       icon: 'https://docs.2gis.com/img/dotMarker.svg',
                   })
               );
               markers.push(
-                  new mapgl.Marker(map, {
+                  new mapgl.Marker(self.map, {
                       coordinates:  self.VictimCoords,
                       icon: 'https://docs.2gis.com/img/dotMarker.svg',
                   })
@@ -179,29 +180,29 @@ export default {
 
                   Angle = [maneuvers[count + 3] - maneuvers[count + 1], maneuvers[count + 2] - maneuvers[count]]
                   console.log(Math.atan2(Angle[0],Angle[1]) * Radian - 90, Angle);
-                  map.setRotation(Math.atan2(Angle[0],Angle[1]) * Radian - 90)
+                  self.map.setRotation(Math.atan2(Angle[0],Angle[1]) * Radian - 90)
 
                   count+=2
                   if (count%4 == 0) {
-                    map.setCenter([maneuvers[count], maneuvers[count + 1]])
+                    self.map.setCenter([maneuvers[count], maneuvers[count + 1]])
                   }
                   if(count == maneuvers.length - 2){
-                    map.on('move', MarkerAction)
-                    map.on('moveend', getReturnGeocoding)
+                    self.map.on('move', MarkerAction)
+                    self.map.on('moveend', getReturnGeocoding)
                     marker2.destroy()
                     getReturnGeocoding()
                     clearInterval(time)
                     directions.clear();
                     self.Arrived = 'Saver'
                     self.$store.commit('FiremanArrived')
-                    marker = new mapgl.Marker(map, {
-                      coordinates: map.getCenter(),
+                    marker = new mapgl.Marker(self.map, {
+                      coordinates: self.map.getCenter(),
                       icon: 'Cursor.svg'
                     });
                   }
                 }, 1000);
-                marker2 = new mapgl.Marker(map, {
-                  coordinates: map.getCenter(),
+                marker2 = new mapgl.Marker(self.map, {
+                  coordinates: self.map.getCenter(),
                   icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
                   zIndex: 100
                 });
@@ -212,14 +213,14 @@ export default {
           }
           else if (self.FireStatus == true) {
             markers.push(
-                new mapgl.Marker(map, {
+                new mapgl.Marker(self.map, {
                     coordinates: [76.93741563189342, 43.24249282996095],
                     icon: 'https://docs.2gis.com/img/dotMarker.svg',
                 })
             );
             markers.push(
-                new mapgl.Marker(map, {
-                    coordinates:  map.getCenter(),
+                new mapgl.Marker(self.map, {
+                    coordinates:  self.map.getCenter(),
                     icon: 'https://docs.2gis.com/img/dotMarker.svg',
                 })
             );
@@ -237,8 +238,8 @@ export default {
                   },
                   {
                     type: "pedo",
-                    x: map.getCenter()[0],
-                    y: map.getCenter()[1]
+                    x: self.map.getCenter()[0],
+                    y: self.map.getCenter()[1]
                   }
                 ]
               })
@@ -294,11 +295,11 @@ export default {
                   marker2.setCoordinates([maneuvers[count], maneuvers[count + 1]])
                   count+=2
                   if (count%10 == 0) {
-                    map.setCenter([maneuvers[count], maneuvers[count + 1]])
+                    self.map.setCenter([maneuvers[count], maneuvers[count + 1]])
                   }
                   if(count == maneuvers.length - 2){
-                    map.on('move', MarkerAction)
-                    map.off('moveend', getReturnGeocoding)
+                    self.map.on('move', MarkerAction)
+                    self.map.off('moveend', getReturnGeocoding)
                     marker2.destroy()
                     getReturnGeocoding()
                     clearInterval(time)
@@ -306,14 +307,14 @@ export default {
                     self.Arrived = 'Ord'
                     self.Searching = false
                     self.$store.commit('FiremanArrived')
-                    marker = new mapgl.Marker(map, {
-                      coordinates: map.getCenter(),
+                    marker = new mapgl.Marker(self.map, {
+                      coordinates: self.map.getCenter(),
                       icon: 'Cursor.svg'
                     });
                   }
                 }, 1000);
-                marker2 = new mapgl.Marker(map, {
-                  coordinates: map.getCenter(),
+                marker2 = new mapgl.Marker(self.map, {
+                  coordinates: self.map.getCenter(),
                   icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
                   zIndex: 100
                 });
@@ -335,7 +336,7 @@ export default {
     }
 
     function getReturnGeocoding(){
-      axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${map.getCenter()[0]}&lat=${map.getCenter()[1]}&key=ruhwrq0201`)
+      axios.get(`https://catalog.api.2gis.com/3.0/items/geocode?lon=${self.map.getCenter()[0]}&lat=${self.map.getCenter()[1]}&key=ruhwrq0201`)
         .then(function(response) {
           console.log(response);
           locationInfo.innerHTML = response.data.result.items[0].address_name || response.data.result.items[0].full_name
@@ -350,6 +351,14 @@ export default {
     // map.getCenter
   },
   methods:{
+    SetCenter(){
+      var options = {
+        animate: true,
+        duration: 1000,
+        easing: 'easeInQuart'
+      }
+      this.map.setCenter(this.currentCoords, options)
+    },
     chAdr(adr){
       this.currentAdress = adr
     },

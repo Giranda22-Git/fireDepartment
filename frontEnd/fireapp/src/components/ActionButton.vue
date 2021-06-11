@@ -1,5 +1,6 @@
 <template>
   <div id="main" v-if="IsTurned" class="main">
+    <q-btn class = 'navBut' round icon="fullscreen_exit"  @click="$emit('GetCenter')" />
     <div class = 'actionButton' @click = "actionButtonPressed">Вызвать Пожарных</div>
     <div v-touch-swipe="swipeAction" class="contentBlock" id="contentBlock" v-show="stage>1" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}`">
       <div style = "min-height: calc(35vh - 7%)">
@@ -106,14 +107,15 @@ export default {
     turnBubbling(){
       var containBlock = document.getElementById('contentBlock')
       var but = document.querySelector('.actionButton')
+      var butNav = document.querySelector('.navBut')
       var openAllPage = document.querySelector('.openAllPage')
       var self = this
       document.querySelector('body').addEventListener('click', function(e){
         console.log(e.target);
-        if(self.next == true || e.target == openAllPage || e.target == containBlock || containBlock.contains(e.target) || e.target == but){
+        if(self.next == true || e.target == openAllPage || e.target == containBlock || containBlock.contains(e.target) || e.target == but || e.target == butNav ||  butNav.contains(e.target)){
           console.log(containBlock.contains(e.target));
         }else{
-          console.log(containBlock.contains(e.target));
+          console.log(containBlock.contains(e.target),e.target);
           self.bubblingCloseTab()
         }
       },{once: true})
@@ -243,7 +245,6 @@ h6{
   position: absolute;
   bottom: 0vh;
   transition: 0.5s;
-  overflow: hidden;
 }
 .contentBlock h4{
   margin-top: 4%;
@@ -338,5 +339,11 @@ h6{
   100%{
     opacity: 1;
   }
+}
+.navBut{
+  margin-top: -100px;
+  margin-left: 30px;
+  background-color: #e85537;
+  color: white;
 }
 </style>

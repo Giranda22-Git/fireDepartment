@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <h6>Добро пожаловать</h6>
-    <h2>Pojarka</h2>
+    <h2>101.kz</h2>
     <h4>Вызов пожарных через телефон!</h4>
     <div class="button-parent">
       <div class="button" @click = "$emit('ahead')">Вход</div>

@@ -22,10 +22,14 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-geolocation": {
         "GPS_REQUIRED": "true"
-      }
+      },
+      "cordova-plugin-dialogs": {}
     },
     "platforms": [
       "android"
     ]
+  },
+  "dependencies": {
+    "cordova-plugin-dialogs": "^2.0.2"
   }
 }

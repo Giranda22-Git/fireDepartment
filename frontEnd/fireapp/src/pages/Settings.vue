@@ -87,22 +87,14 @@ export default {
     getStatus(){
       this.$store.commit('GetStatusSaver')
     },
-    // async click (){
-    //   console.log(1);
-    //   Notification.requestPermission().then(async (result) => {
-    //     if (result === 'granted') {
-    //       alert(1)
-    //       const reg = await navigator.serviceWorker.getRegistration();
-    //       console.log(reg);
-    //       reg.showNotification("Hello My Friend!");
-    //       setInterval(() => {
-    //         reg.showNotification("Hello My Friend!");
-    //       }, 3000);
-    //     } else {
-    //       alert(2)
-    //     }
-    //   });
-    // },
+    async click (){
+      navigator.notification.beep(3);
+      console.log(1);
+        navigator.notification.alert("Hello My Friend!");
+        setInterval(() => {
+          navigator.notification.alert("Hello My Friend!");
+        }, 3000);
+    },
 		async newBrigade () {
 			const params = {
 				numberOfFireBrigade: this.numberOfFireBrigade,

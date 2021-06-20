@@ -36,12 +36,13 @@
           </template>
         </q-input>
         <div v-for="(el,i) in SuggestedVars" :key=i>
-          <div v-if="LocalAdress && el.full_name && el.address_name" class="AdressButton" @click="LocalAdress= el.full_name || el.address_name">{{el.full_name || el.address_name}}</div>
+          <!-- point -->
+          <div v-if="LocalAdress && el.full_name && el.address_name" class="AdressButton" @click="ClickAdress(el.full_name || el.address_name, el.point)">{{ el.address_name || el.full_name }}</div>
         </div>
       </div>
     </div>
       <q-item-section v-if="next==true">
-        <q-icon @click.stop="closeNext" id="icon" name="arrow_back" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}; font-size: 25px;`" />
+        <q-icon @click.stop="closeNext" id="icon" name="arrow_back" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}; font-size: 25px; margin-top: 5vh`" />
       </q-item-section>
     <div v-if="next==true" class="contentBlockNext" id = "nextBlock" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}`">
       <h6 class="title" style="text-align: center; font-size: 1.8em">Вызов Пожарных</h6>
@@ -63,35 +64,46 @@ export default {
     Coords: Array
   },
   watch:{
-  Adress(newV, oldV){
-    this.LocalAdress = newV
-  },
-  LocalAdress(newV, oldV){
-    console.log(1);
-    var self = this
-    this.$emit('chAdr', this.LocalAdress)
-    axios.get(`https://catalog.api.2gis.com/3.0/suggests?q=${newV}&sort_point=${this.Coords[0]},${this.Coords[1]}&key=ruhwrq0201`)
-    .then(function(response) {
-      self.SuggestedVars = response.data?.result?.items.filter((card,index) => index < 6)
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-    })
-  },
+    LocalCoords(newV){
+      console.log('PALUNDRA');
+      this.$emit('ChCoords', newV)
+    },
+    Adress(newV, oldV){
+      this.LocalAdress = newV
+    },
+    LocalAdress(newV, oldV){
+      console.log(1);
+      var self = this
+      axios.get(`https://catalog.api.2gis.com/3.0/suggests?q=${newV}&sort_point=${this.Coords[0]},${this.Coords[1]}&fields=items.point&key=ruhwrq0201`)
+      .then(function(response) {
+        console.log(response);
+        self.SuggestedVars = response.data?.result?.items.filter((card,index) => index < 6)
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+    },
 },
   data () {
     return {
       stage: 1,
       next: false,
       LocalAdress: '',
-      SuggestedVars: null
+      SuggestedVars: null,
+      LocalCoords: []
     }
   },
   Beforemount(){
     this.LocalAdress = this.Adress
   },
   methods:{
+    ClickAdress(FP, SP){
+      console.log(FP, SP);
+      console.log('PALUNDRA');
+      this.$emit('chAdr', FP)
+      this.$emit('ChCoords', SP)
+    },
     actionButtonPressed(){
       this.stage += 1
       document.getElementById('main').style.height = '35vh'
@@ -102,6 +114,7 @@ export default {
     },
     completeAdress(){
       this.stage += 1
+      document.querySelector('.navBut').style.display='none'
       document.getElementById('main').style.height = '95vh'
     },
     turnBubbling(){
@@ -136,12 +149,14 @@ export default {
         }, 550);
         document.getElementById('contentBlock').style.bottom = '-100%'  
       } else {
+        document.querySelector('.navBut').style.display='block'
         this.stage -= 1
         document.getElementById('main').style.height = '35vh'
       }
     },
     closeTab(){
       setTimeout(() => {
+        document.querySelector('.navBut').style.display='block'
         this.stage = 1      
       }, 550);
       document.getElementById('main').style.height = '10vh' 
@@ -215,6 +230,7 @@ h6{
   height: 100%;
   transition: 0.5s;
   padding: 5% 7% 5% 7%;
+  overflow: hidden;
   bottom: 0;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -225,7 +241,6 @@ h6{
 .contentBlockNext{
   position: absolute;
   width: 100%;
-  height: 100%;
   transition: 0.5s;
   padding: 7%;
   bottom: 0;

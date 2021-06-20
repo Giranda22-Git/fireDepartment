@@ -2,7 +2,7 @@
   <div id="main" class="main">
     <div class="contentBlock" id="contentBlock" :style="`${Theme == 'black' ? 'background: #121212' : 'background: #fff'}`">
         <div class="title">Поиск пожарной машины...</div>
-        <div style="margin-top: 10px; display: flex; justify-content: center; flex-direction: column; align-items: center">
+        <div @click="$emit('cancelTrip')" style="margin-top: 10px; display: flex; justify-content: center; flex-direction: column; align-items: center">
             <q-btn round color="red-5" icon="close" />
             <div style = "text-align: center">Отменить<br>поездку</div>
         </div>

@@ -4,9 +4,9 @@
     <div id = 'Ob' style='width:100vw; height: 95vh'>
     <div id='map' style='width:100vw; height: 95vh'></div></div>
     <!-- <div class="page-reload" @click="reload">Обновить карту</div> -->
-    <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search" @GetCenter="SetCenter"/>
+    <ActionButton v-if="StatusPeople!='saver'" :IsTurned="true" :Coords="currentCoords" :Adress="currentAdress" @chAdr='chAdr' @Search="Search" @GetCenter="SetCenter" @ChCoords="NewUpdatedCoords"/>
     <PulseAnimation v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
-    <SearchingButton v-if="Searching == true && StatusPeople!='saver' && !FireStatus" />
+    <SearchingButton v-if="Searching == true && StatusPeople!='saver' && !FireStatus" @cancelTrip='TripCancel' />
     <ArrivedPage v-if="Arrived.length > 0" :text='Arrived'/>
   </q-page>
 </template>
@@ -41,8 +41,7 @@ export default {
     this.forceUpdate()
     this.checkTheme()
     var marker, marker2
-    var map
-    var Radian = 190/Math.PI
+    var Radian = 180/Math.PI
     var center
     var self = this
     var locationInfo = document.getElementById('location')
@@ -68,6 +67,10 @@ export default {
       marker = new mapgl.Marker(self.map, {
         coordinates: self.map.getCenter(),
         icon: 'Cursor.svg'
+      });
+      const MyCoordsMarker = new mapgl.Marker(map, {
+          coordinates: self.map.getCenter(),
+          icon: ''
       });
       self.MarkerCoords = self.map.getCenter()
       self.currentCoords = self.map.getCenter()
@@ -360,6 +363,7 @@ export default {
       this.map.setCenter(this.currentCoords, options)
     },
     chAdr(adr){
+      document.getElementById('location').innerHTML = adr
       this.currentAdress = adr
     },
     forceUpdate(){
@@ -389,6 +393,17 @@ export default {
     Search(){
       this.Searching = true
       this.$store.commit('WebSocketSendNewFire', [this.currentAdress, this.MarkerCoords])
+    },
+    NewUpdatedCoords(coords){
+      var options = {
+        animate: true,
+        duration: 1000,
+        easing: 'easeInQuart'
+      }
+      this.map.setCenter([coords.lon,coords.lat], options)
+    },
+    TripCancel(){
+      this.Searching = false
     }
   },
   components:{

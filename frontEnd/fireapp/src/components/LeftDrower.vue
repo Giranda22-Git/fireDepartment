@@ -21,7 +21,7 @@
           class="text-grey-8"
           style="display: flex; align-items: center; flex-direction: column"
         >
-          <span class = "userName">{{userPhoneNumber}}</span>
+          <span class = "userName" @click='MMS'>{{userPhoneNumber}}</span>
         </q-item-label>
         <EssentialLink
           v-for="link in essentialLinks"
@@ -30,6 +30,7 @@
         />
         <div class="button" @click="ExitAction">Выйти</div>
         <div class="button" @click="SwichTheme">{{theme == 'black' ? 'Дневной режим' : 'Ночной режим'}}</div>
+        
       </q-list>
     </q-drawer>
 
@@ -55,18 +56,19 @@ export default {
   beforeMount(){
     if(this.status == 'ordinary'){
       return this.essentialLinks = [
-      {
-        title: '2GIS',
-        caption: '2gis maps',
-        icon: 'public',
-        link: '/'
-      },
-      {
-        title: 'Settings',
-        caption: 'Settings',
-        icon: 'settings',
-        link: '/settings'
-      }]
+      // {
+      //   title: '2GIS',
+      //   caption: '2gis maps',
+      //   icon: 'public',
+      //   link: '/'
+      // },
+      // {
+      //   title: 'Settings',
+      //   caption: 'Settings',
+      //   icon: 'settings',
+      //   link: '/settings'
+      // }
+      ]
     }else if(this.status == 'saver'){
       this.essentialLinks = [
       {
@@ -80,13 +82,14 @@ export default {
         caption: 'fire calls',
         icon: 'sensors',
         link: '/fireCalls'
-      },
-      {
-        title: 'Settings',
-        caption: 'Settings',
-        icon: 'settings',
-        link: '/settings'
-      }]
+      }
+      // {
+      //   title: 'Settings',
+      //   caption: 'Settings',
+      //   icon: 'settings',
+      //   link: '/settings'
+      // }
+      ]
     }
   },
   mounted(){
@@ -99,6 +102,9 @@ export default {
     })
   },
   methods:{
+    MMS(){
+      this.$store.commit('GetStatusSaver')
+    },
     ExitAction(){
       this.$store.commit('logout')
       location.reload()

@@ -19,6 +19,32 @@ export default {
   },
   created(){
     if(this.isLoggedIn){
+      this.CreateWS()
+    }
+  },
+  data () {
+    return {
+      transitionName: '',
+      isModal: false
+    }
+  },
+  watch: {
+    $route(to, from) {
+      const toDepth = to.path.split('/')[1]
+      this.transitionName = toDepth == '' ? 'opacity' : 'slide-left'
+    },
+    theme: function(oldV, newV){
+      this.$q.dark.set(newV == 'black' ? false : true)
+    }
+  },
+  beforeMount(){
+    this.$q.dark.set(this.theme == 'black' ? true : false)
+  },
+  components:{
+    actualCall
+  },
+  methods:{
+    CreateWS(){
       var self = this
       const ws = new WebSocket(`${this.$store.state.backEndWsUrl}` + this.phoneNumber)
       this.$store.commit('CreateWs',ws)
@@ -84,30 +110,11 @@ export default {
         //   self.$store.commit('FiremanCurrentPosition', [10,34])
         // }
       };
-    }
-  },
-  data () {
-    return {
-      transitionName: '',
-      isModal: false
-    }
-  },
-  watch: {
-    $route(to, from) {
-      const toDepth = to.path.split('/')[1]
-      this.transitionName = toDepth == '' ? 'opacity' : 'slide-left'
+      ws.onclose = function(event) {
+        console.log("WS CLOSED", event);
+        self.CreateWS()
+      };
     },
-    theme: function(oldV, newV){
-      this.$q.dark.set(newV == 'black' ? false : true)
-    }
-  },
-  beforeMount(){
-    this.$q.dark.set(this.theme == 'black' ? true : false)
-  },
-  components:{
-    actualCall
-  },
-  methods:{
     HideModal(){
       this.isModal = false
     },

@@ -40,7 +40,7 @@ export default {
     // this.activateButton()
     this.forceUpdate()
     this.checkTheme()
-    var marker, marker2
+    var marker, marker2, MyCoordsMarker
     var Radian = 180/Math.PI
     var center
     var self = this
@@ -68,9 +68,10 @@ export default {
         coordinates: self.map.getCenter(),
         icon: 'Cursor.svg'
       });
-      const MyCoordsMarker = new mapgl.Marker(map, {
+      MyCoordsMarker = new mapgl.Marker(self.map, {
           coordinates: self.map.getCenter(),
-          icon: ''
+          icon: 'MyPos.svg',
+          zIndex: -1
       });
       self.MarkerCoords = self.map.getCenter()
       self.currentCoords = self.map.getCenter()
@@ -270,7 +271,7 @@ export default {
                 console.log(pointss,'LLLLLLLLLLL');
                 var c = Math.round(pointss.length / 12)
                 directions.carRoute({
-                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], pointss[c*8], [76.92285818015283, 43.23393034436996]],
+                    points: [[76.93741563189342, 43.24249282996095],pointss[c*2], pointss[c*4], pointss[c*6], pointss[c*8], self.map.getCenter()],
                     style: {
                       routeLineWidth: [
                           'interpolate',

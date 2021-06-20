@@ -52,6 +52,9 @@ export default {
             self.$store.commit('cr_phone', [self.phone, response.data._id])
             setTimeout(() => {
               self.$router.push('/')
+              setTimeout(() => {
+                location.reload()
+              }, 700);
             }, 200);
           })
           .catch(function (error) {
